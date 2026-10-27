@@ -1,0 +1,16 @@
+{
+  "dataset": "pets",
+  "n": 7000,
+  "counts": {
+    "train": 5000,
+    "val": 1000,
+    "test": 1000
+  },
+  "n_groups": 6965,
+  "n_duplicate_groups": 34,
+  "n_images_in_duplicate_groups": 69,
+  "groups_spanning_splits": 0,
+  "dhash_threshold": 10,
+  "min_train_per_class": 125,
+  "min_test_per_class": 26
+}

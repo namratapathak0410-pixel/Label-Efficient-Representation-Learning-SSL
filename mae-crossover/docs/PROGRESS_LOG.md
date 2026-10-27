@@ -30,7 +30,15 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 16:17 | ImageNetV2 download started, then interrupted when the Claude session ended | - |
 | ~16:40 | Checked caches: all 4 datasets complete. Class counts in the 7,000-image samples: CIFAR-10 700 each; EuroSAT 519-778; Pets 176-191; PlantVillage 19-710 (very imbalanced: smallest class gets 1 labelled image at 5 %) | - |
 | ~16:40 | Restarted `prepare` (finished datasets are skipped) to fetch ImageNetV2 | in progress |
-| ~16:45 | Wrote `docs/THEORY.md` (full theory, every number explained). Verified parameter counts by hand against PyTorch: ViT-Tiny 5,507,914 and ResNet-18 11,181,642 (10 classes) | this commit |
+| ~16:45 | Wrote `docs/THEORY.md` (full theory, every number explained). Verified parameter counts by hand against PyTorch: ViT-Tiny 5,507,914 and ResNet-18 11,181,642 (10 classes) | `eefd787` |
+| 16:28 | ImageNetV2 downloaded and cached (10,000 images, 1,000 classes, 0 unreadable). No fallback dataset was needed for any domain | - |
+| 16:28 | Smoke test, attempt 1: **failed** - `pets.npz` was corrupt (its write was cut off when the earlier Claude session ended, but the file existed so it looked finished) | bug found |
+| 16:30 | Fix 1: caches are now written to a `.partial.npz` file and renamed only when complete; an unreadable cache is detected and rebuilt automatically | - |
+| 16:32 | Fix 1 exposed bug 2: Windows kept the broken file open, so it could not be deleted and the fallback switched Pets to the Kaggle copy. Fix 2: open the file with our own handle. Deleted the Kaggle copy, rebuilt Pets from the official source | - |
+| 16:33-16:42 | Smoke test, attempt 2: **all 8 stages passed end to end** in 8.9 min (64 tiny runs; numbers meaningless by design) | - |
+| 16:43 | Main splits created (identical to smoke splits, same seed 42): ~5,000 / 1,000 / 1,000 per dataset. Duplicate groups: PlantVillage 0, CIFAR-10 0, EuroSAT 1 (78 near-uniform sea/lake images), Pets 34 (69 images) | - |
+| 16:45 | Speed benchmark: ResNet-18 126 ms/step, ViT 115-117 ms/step, MAE 85 ms/step (peak 1.9 GB GPU). Worst-case plan **16.1 h** (MAE 2.2 h, tuning 1.3 h, grid 12.7 h) vs 48 h available | `results/crossover_v1/benchmark.json` |
+| 16:46 | Started `distance` (FID, OTDD, ImageNet confidence, linear probe) | in progress |
 
 ## Next
 1. Finish downloads (Pets, ImageNetV2).

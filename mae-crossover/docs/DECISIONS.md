@@ -29,3 +29,5 @@ If a decision changes later, the old row stays and a new row is added (so the hi
 | 22 | 10-27 | All work on `main` branch | Soham | Soham and Namrata work on it together |
 | 23 | 10-27 | Old code moved to `archive/`, not deleted; `hi.py` removed | Claude (Soham: "change the entire pipeline") | Keeps the history; test file was not part of the project |
 | 24 | 10-27 | Keep separate, continuously updated docs in `docs/` and push regularly | Soham | Traceability for the thesis |
+| 25 | 10-27 | Oxford Pets taken from the official torchvision source, not the Kaggle copy that the fallback briefly picked | Claude | The fallback was triggered by a file-locking bug, not by a download failure; the official release is the citable one |
+| 26 | 10-27 | Keep the 78-image EuroSAT duplicate group | Claude | They are featureless sea/lake patches that genuinely look identical; keeping them together in one split is the conservative (leakage-safe) choice |

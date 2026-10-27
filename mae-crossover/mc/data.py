@@ -201,8 +201,14 @@ def build_cache(name: str, cfg: dict, n: int | None) -> Path:
     p = paths(cfg)
     out = p["cache"] / f"{name}.npz"
     if out.exists():
-        log.info("[%s] cache exists: %s", name, out)
-        return out
+        try:
+            with open(out, "rb") as f:  # own handle, so Windows can delete the file if it is broken
+                _ = np.load(f)["labels"].shape
+            log.info("[%s] cache exists: %s", name, out)
+            return out
+        except Exception as e:  # e.g. a write that was interrupted
+            log.warning("[%s] cache is unreadable (%s) - rebuilding", name, e)
+            out.unlink()
     log.info("[%s] listing / downloading ...", name)
     classes, labels, loaders, ids = SOURCES[name](p["raw"])
     log.info("[%s] %d images, %d classes available", name, len(labels), len(classes))
@@ -231,8 +237,10 @@ def build_cache(name: str, cfg: dict, n: int | None) -> Path:
     labs = np.asarray([remap[v] for v in labs], dtype=np.int64)
     classes = [classes[i] for i in present]
     hashes = np.stack([dhash256(x) for x in imgs])
-    np.savez(out, images=imgs, labels=labs, class_names=np.asarray(classes), ids=np.asarray(keep_ids),
+    tmp = out.with_name(out.stem + ".partial.npz")  # write-then-rename: an interrupted write never looks finished
+    np.savez(tmp, images=imgs, labels=labs, class_names=np.asarray(classes), ids=np.asarray(keep_ids),
              dhash=hashes)
+    tmp.replace(out)
     write_json(p["cache"] / f"{name}_info.json", dict(
         name=name, n_images=int(len(labs)), n_classes=len(classes), n_available=int(len(labels)),
         n_corrupted=len(bad), corrupted=bad[:50], img_size=cfg["img_size"],

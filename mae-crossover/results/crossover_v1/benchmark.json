@@ -1,0 +1,24 @@
+{
+  "ms_per_step": {
+    "A_cnn_scratch": 126.28660600000028,
+    "C_vit_imagenet": 115.22709066666721,
+    "D_vit_scratch": 117.01124466666745,
+    "E_vit_mae": 117.01124466666745
+  },
+  "mae_ms_per_step": 85.01588999999967,
+  "steps_per_run": {
+    "5": 600,
+    "10": 600,
+    "20": 800,
+    "50": 2000,
+    "100": 4000
+  },
+  "n_train": 4999,
+  "hours_worst_case": {
+    "mae": 2.153735879999992,
+    "tune": 1.2680964960000063,
+    "grid": 12.680964960000061,
+    "total": 16.10279733600006
+  },
+  "note": "worst case = no early stopping; real runs usually stop earlier"
+}

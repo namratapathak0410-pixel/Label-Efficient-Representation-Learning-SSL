@@ -1,0 +1,16 @@
+{
+  "dataset": "cifar10",
+  "n": 7000,
+  "counts": {
+    "train": 5000,
+    "test": 1000,
+    "val": 1000
+  },
+  "n_groups": 7000,
+  "n_duplicate_groups": 0,
+  "n_images_in_duplicate_groups": 0,
+  "groups_spanning_splits": 0,
+  "dhash_threshold": 10,
+  "min_train_per_class": 500,
+  "min_test_per_class": 100
+}

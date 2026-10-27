@@ -1,0 +1,16 @@
+{
+  "dataset": "eurosat",
+  "n": 7000,
+  "counts": {
+    "train": 5000,
+    "val": 1000,
+    "test": 1000
+  },
+  "n_groups": 6923,
+  "n_duplicate_groups": 1,
+  "n_images_in_duplicate_groups": 78,
+  "groups_spanning_splits": 0,
+  "dhash_threshold": 10,
+  "min_train_per_class": 371,
+  "min_test_per_class": 74
+}

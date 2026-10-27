@@ -254,7 +254,7 @@ def write_report(cfg, summ, gap, cross, assoc, agree, dist, df):
                             if r.n_seeds > 1 else f"{r[METRIC + '_mean']:.3f}", axis=1)
     s["ECE"] = s.apply(lambda r: f"{r['test_ece_mean']:.3f}", axis=1)
     table = s.pivot_table(index=["dataset", "budget_pct"], columns="arm", values="macro_f1", aggfunc="first")
-    seeds = sorted(df.seed.unique())
+    seeds = sorted(int(s) for s in df.seed.unique())
     txt = f"""# Results: when does target-domain MAE overtake ImageNet initialisation?
 
 Generated automatically from `runs.csv` ({len(df)} fine-tuning runs, seeds {seeds}). Every number below comes from
