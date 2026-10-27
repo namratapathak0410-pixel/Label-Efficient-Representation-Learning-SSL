@@ -1,0 +1,29 @@
+# Tiny configuration to test that the whole pipeline runs (minutes, even on a weak CPU).
+# Uses a synthetic dataset created by scripts/prepare_dataset.py --dataset synthetic.
+# Numbers produced with this config are meaningless for research.
+base: cpu.yaml
+experiment_name: smoke_test
+
+data:
+  name: synthetic
+  root: data/raw/synthetic
+  max_per_class: null
+  img_size: 64
+  cache_size: 72
+
+models:
+  strict_pretrained: false           # allow offline testing (falls back to random init and records it)
+
+train:
+  budgets: [10, 100]
+  seeds: [0]
+  batch_size: 16
+  epochs: 2
+  min_updates: 4
+  max_epochs: 3
+  target_evals: 2
+  patience: 2
+
+mae:
+  epochs: 2
+  batch_size: 32

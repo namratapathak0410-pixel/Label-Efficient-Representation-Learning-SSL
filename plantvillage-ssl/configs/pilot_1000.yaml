@@ -1,0 +1,18 @@
+# 1,000-image pilot study (stratified sample of the dataset, then split into train/val/test).
+# With 1,000 images and 38 classes only ~700 are in the train split (~18 per class),
+# so 1% labels would be < 1 image per class -> the code uses at least 1 image per class,
+# and we replace 1% by 50%. The "n_labeled" column in results/runs.csv shows the real number.
+# NOTE: pretraining uses ONLY the train split (~700 images), not all 1,000 images.
+base: cpu.yaml
+experiment_name: plantvillage_pilot1000
+
+data:
+  max_per_class: null
+  max_total: 1000
+
+train:
+  budgets: [5, 10, 20, 50, 100]
+  min_updates: 200
+
+mae:
+  epochs: 150

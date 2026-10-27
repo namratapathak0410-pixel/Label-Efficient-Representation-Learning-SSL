@@ -1,0 +1,31 @@
+# Free Colab T4 (15 GB, ~12 GB RAM) profile: medium-size models, 128 px, 300 images/class cap.
+# ViT-Small/16 instead of ViT-B/16 and ResNet50 kept for the CNN. Adjust caps if a run is too slow:
+# run `python main.py benchmark --config configs/colab_t4.yaml` first to see seconds/epoch.
+base: gpu.yaml
+experiment_name: plantvillage_colab_t4
+
+data:
+  max_per_class: 300
+  img_size: 128
+  cache_in_ram: true
+  cache_size: 144
+  num_workers: 2
+
+models:
+  vit_arch: vit_small_patch16_224
+
+train:
+  batch_size: 64
+  min_updates: 500
+  max_epochs: 100
+  lr:
+    C_vit_pretrained: 1.0e-4
+    E_vit_mae: 5.0e-4
+
+mae:
+  epochs: 150
+  batch_size: 128
+  decoder_dim: 256
+  decoder_depth: 4
+  decoder_heads: 8
+  lr: 5.0e-4

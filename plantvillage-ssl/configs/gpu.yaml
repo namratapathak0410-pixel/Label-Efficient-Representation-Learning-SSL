@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------
+# Full-size protocol from the project prompt: ResNet50 + ViT-B/16 at 224 px, all images.
+# Needs a GPU with >= 16 GB (ViT-B/16 MAE pretraining). A free Colab T4 (15 GB) is
+# borderline for ViT-B -> use configs/colab_t4.yaml there.
+# ---------------------------------------------------------------------------
+experiment_name: plantvillage_gpu
+
+data:
+  name: plantvillage
+  root: data/raw/plantvillage
+  max_per_class: null
+  max_total: null
+  img_size: 224
+  cache_in_ram: false
+  cache_size: null
+  num_workers: 4
+
+split:
+  ratios: [0.70, 0.15, 0.15]
+  seed: 42
+  near_dup_threshold: 10
+
+models:
+  kinds: [A_cnn_scratch, B_cnn_pretrained, C_vit_pretrained, D_vit_scratch, E_vit_mae]
+  cnn_arch: resnet50
+  vit_arch: vit_base_patch16_224
+  strict_pretrained: true
+  vit_drop_path: 0.1
+
+train:
+  budgets: [1, 5, 10, 20, 100]
+  seeds: [0, 1, 2]
+  batch_size: 64
+  epochs: 30
+  min_updates: 1000
+  max_epochs: 200
+  target_evals: 30
+  patience: 8
+  weight_decay: 0.05
+  warmup_epochs: 3
+  label_smoothing: 0.0
+  grad_clip: 1.0
+  lr:
+    A_cnn_scratch: 1.0e-3
+    B_cnn_pretrained: 3.0e-4
+    C_vit_pretrained: 5.0e-5
+    D_vit_scratch: 5.0e-4
+    E_vit_mae: 2.0e-4
+
+mae:
+  seed: 0
+  mask_ratio: 0.75
+  epochs: 100
+  batch_size: 128
+  lr: 3.0e-4
+  weight_decay: 0.05
+  warmup_epochs: 10
+  decoder_dim: 512
+  decoder_depth: 8
+  decoder_heads: 16
+  norm_pix_loss: true

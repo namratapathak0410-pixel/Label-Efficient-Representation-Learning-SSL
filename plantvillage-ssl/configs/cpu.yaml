@@ -1,0 +1,64 @@
+# ---------------------------------------------------------------------------
+# CPU profile (no GPU). Everything is scaled down so that it can finish on a laptop:
+#   * small images (96 px), small ViT (ViT-Tiny/16), small CNN (ResNet18)
+#   * at most 100 images per class are used (~3,800 images for PlantVillage)
+# These are DEVIATIONS from the ViT-B/16 + ResNet50 protocol in the project prompt.
+# Use configs/gpu.yaml (Colab / lab GPU) for the full-size version.
+# ---------------------------------------------------------------------------
+experiment_name: plantvillage_cpu
+
+data:
+  name: plantvillage
+  root: data/raw/plantvillage        # ImageFolder: <root>/<class_name>/<image>.jpg
+  max_per_class: 100                 # null = use every image
+  max_total: null                    # alternative: stratified cap on total images (pilot study)
+  img_size: 96
+  cache_in_ram: true                 # decode+resize once, keep in RAM (big CPU speed-up)
+  cache_size: 112                    # stored size (a bit larger than img_size so random crops make sense)
+  num_workers: 0                     # 0 is safest on Windows / VS Code
+
+split:
+  ratios: [0.70, 0.15, 0.15]         # train / val / test
+  seed: 42                           # ONE fixed split for the whole study
+  near_dup_threshold: 10             # max differing bits (out of 256) to call two images near-duplicates
+
+models:
+  kinds: [A_cnn_scratch, B_cnn_pretrained, C_vit_pretrained, D_vit_scratch, E_vit_mae]
+  cnn_arch: resnet18
+  vit_arch: vit_tiny_patch16_224     # same architecture is used for C, D and E (fair comparison)
+  strict_pretrained: true            # crash if ImageNet weights cannot be downloaded
+  vit_drop_path: 0.1
+
+train:
+  budgets: [1, 5, 10, 20, 100]       # % of the TRAIN-split labels that may be used
+  seeds: [0, 1, 2]
+  batch_size: 32
+  epochs: 30                         # minimum number of epochs
+  min_updates: 300                   # small budgets get more epochs so that they still see >= this many steps
+  max_epochs: 150
+  target_evals: 30                   # validation is run about this many times per run
+  patience: 8                        # early stopping patience (in validation evaluations)
+  weight_decay: 0.05
+  warmup_epochs: 2
+  label_smoothing: 0.0               # 0 keeps the calibration comparison clean
+  grad_clip: 1.0
+  # Learning rates per model kind (AdamW). Tune ONLY with validation results.
+  lr:
+    A_cnn_scratch: 1.0e-3
+    B_cnn_pretrained: 3.0e-4
+    C_vit_pretrained: 2.0e-4
+    D_vit_scratch: 5.0e-4
+    E_vit_mae: 5.0e-4
+
+mae:
+  seed: 0
+  mask_ratio: 0.75
+  epochs: 100
+  batch_size: 64
+  lr: 5.0e-4
+  weight_decay: 0.05
+  warmup_epochs: 5
+  decoder_dim: 128
+  decoder_depth: 2
+  decoder_heads: 4
+  norm_pix_loss: true

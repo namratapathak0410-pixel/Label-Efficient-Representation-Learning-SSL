@@ -1,0 +1,20 @@
+# Large / generated files must never go to GitHub
+data/raw/
+data/cache/
+checkpoints/
+results/
+*.pt
+*.pth
+*.ckpt
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+.vscode/
+.DS_Store
+# keep the folder placeholders
+!data/raw/.gitkeep
+!data/cache/.gitkeep
+!checkpoints/.gitkeep
+!results/.gitkeep
