@@ -70,7 +70,7 @@ mean ImageNet max-softmax confidence, linear-probe validation accuracy.
 ## Amendments (made before any main-experiment training)
 | # | Date (IST) | Change | Reason | Results existing at the time |
 |---|---|---|---|---|
-| 1 | 2026-10-27 ~16:55 | MAE pretraining 400 -> **800 epochs**, warm-up 20 -> **40 epochs** (~15,200 steps per pretraining) | The speed benchmark showed the full plan needs ~16 h worst case of the 48 h; 800 epochs is the standard MAE schedule and avoids under-training arm E. Chosen by Soham | Only the smoke test (meaningless by design) and the domain distances (fixed, unaffected by this change). No MAE pretraining or main fine-tuning run had started |
+| 1 | 2026-10-27 16:48 (commit `8daa385`) | MAE pretraining 400 -> **800 epochs**, warm-up 20 -> **40 epochs** (~15,200 steps per pretraining) | The speed benchmark showed the full plan needs ~16 h worst case of the 48 h; 800 epochs is the standard MAE schedule and avoids under-training arm E. Chosen by Soham | Only the smoke test (meaningless by design) and the domain distances (fixed, unaffected by this change). No MAE pretraining or main fine-tuning run had started |
 
 ## Domain distances as measured (recorded before training)
 FID / OTDD / ImageNet confidence / linear-probe accuracy: PlantVillage 433.3 / 30.62 / 0.298 / 0.899;
