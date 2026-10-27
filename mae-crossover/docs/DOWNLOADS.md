@@ -47,5 +47,5 @@ original releases directly (no account, verified checksums). The Kaggle copies a
 | 10-27 15:08 | PlantVillage | OK, 0 unreadable images |
 | 10-27 16:09 | CIFAR-10 | OK (server slow, ~1 h) |
 | 10-27 16:10 | EuroSAT | OK |
-| 10-27 16:10 | Oxford Pets | downloading |
-| - | ImageNetV2 | pending |
+| 10-27 16:17 | Oxford Pets | OK, 0 unreadable images |
+| 10-27 16:17 | ImageNetV2 | interrupted (Claude session ended), restarted ~16:40 |

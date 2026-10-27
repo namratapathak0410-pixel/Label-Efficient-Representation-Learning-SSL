@@ -9,7 +9,8 @@ Hypotheses and the full protocol are fixed in [PREREGISTRATION.md](PREREGISTRATI
 
 Project documentation, kept up to date as work happens: [progress log](docs/PROGRESS_LOG.md) ·
 [decisions](docs/DECISIONS.md) · [downloads](docs/DOWNLOADS.md) · [what each file does](docs/FILES.md) ·
-[why each step](docs/WHY_EACH_STEP.md) · [novelty](docs/NOVELTY.md) · [glossary](docs/GLOSSARY.md)
+[why each step](docs/WHY_EACH_STEP.md) · [novelty](docs/NOVELTY.md) · [glossary](docs/GLOSSARY.md) ·
+[**full theory**](docs/THEORY.md)
 
 ## Arms
 | ID | Model | Starts from |

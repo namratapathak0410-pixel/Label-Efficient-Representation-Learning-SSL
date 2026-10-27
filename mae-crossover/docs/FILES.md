@@ -44,6 +44,7 @@
 | `WHY_EACH_STEP.md` | Plain-English reason for every pipeline step |
 | `NOVELTY.md` | Research gap and novelty, with the literature check |
 | `GLOSSARY.md` | ViT, MAE, ECE and other terms explained simply |
+| `THEORY.md` | Full theory: problem, related work, design, data flow, ResNet/ViT/MAE internals with every number explained, metrics, distances, statistics, limitations |
 
 ### Created when running (not in git unless noted)
 | Path | What |

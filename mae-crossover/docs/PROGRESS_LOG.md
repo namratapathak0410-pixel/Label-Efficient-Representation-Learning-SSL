@@ -24,8 +24,13 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 15:08 | PlantVillage downloaded from Kaggle (no login needed), 54,305 images, 38 classes; 7,000 cached, 0 unreadable | - |
 | 16:09 | CIFAR-10 downloaded (slow server, ~1 h), 60,000 images; 7,000 cached | - |
 | 16:10 | EuroSAT downloaded, 27,000 images; 7,000 cached | - |
-| 16:10 | Oxford Pets downloading (~790 MB at ~0.5 MB/s) | in progress |
-| 16:15 | Started these documentation files (`docs/`) at Soham's request | this commit |
+| 16:10 | Oxford Pets downloading (~790 MB at ~0.5 MB/s) | - |
+| 16:15 | Started these documentation files (`docs/`) at Soham's request | `66a1f3e` |
+| 16:17 | Oxford Pets cached: 7,349 available, 7,000 used, 37 classes, 0 unreadable | - |
+| 16:17 | ImageNetV2 download started, then interrupted when the Claude session ended | - |
+| ~16:40 | Checked caches: all 4 datasets complete. Class counts in the 7,000-image samples: CIFAR-10 700 each; EuroSAT 519-778; Pets 176-191; PlantVillage 19-710 (very imbalanced: smallest class gets 1 labelled image at 5 %) | - |
+| ~16:40 | Restarted `prepare` (finished datasets are skipped) to fetch ImageNetV2 | in progress |
+| ~16:45 | Wrote `docs/THEORY.md` (full theory, every number explained). Verified parameter counts by hand against PyTorch: ViT-Tiny 5,507,914 and ResNet-18 11,181,642 (10 classes) | this commit |
 
 ## Next
 1. Finish downloads (Pets, ImageNetV2).
