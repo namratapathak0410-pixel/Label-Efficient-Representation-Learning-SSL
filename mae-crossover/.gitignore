@@ -1,0 +1,8 @@
+.venv/
+data/
+checkpoints/
+results/*/runs/
+results/smoke/
+__pycache__/
+*.pyc
+*.log

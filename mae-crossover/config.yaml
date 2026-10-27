@@ -1,0 +1,55 @@
+# Main experiment: when does target-domain MAE overtake ImageNet initialisation?
+# Every value here is declared in PREREGISTRATION.md; change it there too if you change it here.
+experiment: crossover_v1
+img_size: 160
+n_per_dataset: 7000          # identical image count in every domain (stratified sample)
+
+# One dataset per domain. If the first candidate fails to download/decode, the next one is used.
+datasets:
+  plant:     [plantvillage, flowers102]
+  objects:   [cifar10, cifar10_kaggle, stl10]
+  satellite: [eurosat, eurosat_kaggle, dtd]
+  animals:   [pets, pets_kaggle, flowers102]
+
+split:
+  val_frac: 0.15
+  test_frac: 0.15
+  split_seed: 42
+  dhash_threshold: 10        # near-duplicate = Hamming distance <= 10 of 256 bits
+
+arms: [A_cnn_scratch, C_vit_imagenet, D_vit_scratch, E_vit_mae]
+
+models:
+  cnn_arch: resnet18
+  vit_arch: deit_tiny_patch16_224   # ImageNet-1k only weights for C; same architecture for D and E
+  vit_pool: avg
+  vit_drop_path: 0.1
+
+mae:
+  per_seed: true             # a separate MAE pretraining per seed, so E's variance includes pretraining
+  epochs: 400
+  warmup_epochs: 20
+  batch_size: 256
+  blr: 1.5e-4                # lr = blr * batch / 256 (He et al. 2022)
+  weight_decay: 0.05
+  mask_ratio: 0.75
+  decoder_dim: 128
+  decoder_depth: 2
+  decoder_heads: 4
+
+train:
+  budgets: [5, 10, 20, 50, 100]
+  seeds: [0, 1, 2]
+  batch_size: 128
+  epochs_equiv: 100
+  min_steps: 600
+  max_steps: 4000
+  eval_points: 25
+  patience: 8
+  warmup_frac: 0.05
+  weight_decay: 0.05
+  layer_decay: 0.75          # pretrained ViTs only (C and E)
+  tune_budget: 20
+  lr_grid:
+    scratch: [5.0e-4, 1.0e-3, 2.0e-3]
+    pretrained: [2.5e-4, 5.0e-4, 1.0e-3]

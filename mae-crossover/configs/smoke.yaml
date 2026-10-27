@@ -1,0 +1,28 @@
+# 5-10 minute end-to-end test of every stage on tiny settings. Results are meaningless.
+experiment: smoke
+img_size: 160
+n_per_dataset: 7000
+datasets:
+  plant:     [plantvillage, flowers102]
+  objects:   [cifar10, cifar10_kaggle, stl10]
+  satellite: [eurosat, eurosat_kaggle, dtd]
+  animals:   [pets, pets_kaggle, flowers102]
+split: {val_frac: 0.15, test_frac: 0.15, split_seed: 42, dhash_threshold: 10}
+arms: [A_cnn_scratch, C_vit_imagenet, D_vit_scratch, E_vit_mae]
+models: {cnn_arch: resnet18, vit_arch: deit_tiny_patch16_224, vit_pool: avg, vit_drop_path: 0.1}
+mae: {per_seed: false, epochs: 2, warmup_epochs: 1, batch_size: 256, blr: 1.5e-4, weight_decay: 0.05,
+      mask_ratio: 0.75, decoder_dim: 128, decoder_depth: 2, decoder_heads: 4}
+train:
+  budgets: [5, 100]
+  seeds: [0, 1]
+  batch_size: 128
+  epochs_equiv: 1
+  min_steps: 40
+  max_steps: 60
+  eval_points: 4
+  patience: 8
+  warmup_frac: 0.05
+  weight_decay: 0.05
+  layer_decay: 0.75
+  tune_budget: 20
+  lr_grid: {scratch: [1.0e-3], pretrained: [5.0e-4]}
