@@ -1,0 +1,7 @@
+{
+  "reference": "ImageNetV2 matched-frequency",
+  "n_reference": 10000,
+  "reference_self_confidence": 0.4576190412044525,
+  "extractor": "deit_tiny_patch16_224",
+  "img_size": 160
+}

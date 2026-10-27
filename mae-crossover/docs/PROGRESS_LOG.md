@@ -38,7 +38,11 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 16:33-16:42 | Smoke test, attempt 2: **all 8 stages passed end to end** in 8.9 min (64 tiny runs; numbers meaningless by design) | - |
 | 16:43 | Main splits created (identical to smoke splits, same seed 42): ~5,000 / 1,000 / 1,000 per dataset. Duplicate groups: PlantVillage 0, CIFAR-10 0, EuroSAT 1 (78 near-uniform sea/lake images), Pets 34 (69 images) | - |
 | 16:45 | Speed benchmark: ResNet-18 126 ms/step, ViT 115-117 ms/step, MAE 85 ms/step (peak 1.9 GB GPU). Worst-case plan **16.1 h** (MAE 2.2 h, tuning 1.3 h, grid 12.7 h) vs 48 h available | `results/crossover_v1/benchmark.json` |
-| 16:46 | Started `distance` (FID, OTDD, ImageNet confidence, linear probe) | in progress |
+| 16:46 | Started `distance` (FID, OTDD, ImageNet confidence, linear probe) | - |
+| 16:50 | Committed fixes, splits, benchmark | `8269a4c` |
+| ~16:52 | Distances done. FID: PlantVillage 433, EuroSAT 318, Pets 273, CIFAR-10 267. ImageNet confidence: Pets 0.51, PlantVillage 0.30, CIFAR-10 0.29, EuroSAT 0.14. OTDD: PlantVillage 30.6, Pets 29.3, CIFAR-10 28.3, EuroSAT 26.4. Linear probe: PlantVillage 0.90, Pets 0.86, EuroSAT 0.86, CIFAR-10 0.83. **The measures disagree on the ordering** | `results/crossover_v1/domain_distance.csv` |
+| ~16:55 | Soham chose to spend spare time on MAE 800 epochs. Recorded as pre-registration amendment 1 together with the measured distances, committed **before** any MAE or main training | this commit |
+| ~16:56 | Wrote `run_experiment.ps1` and launched it in its own window | running |
 
 ## Next
 1. Finish downloads (Pets, ImageNetV2).

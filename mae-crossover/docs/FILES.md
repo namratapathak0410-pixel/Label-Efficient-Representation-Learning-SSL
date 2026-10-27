@@ -12,6 +12,7 @@
 ## `mae-crossover/`
 | Path | What | Read it when |
 |---|---|---|
+| `run_experiment.ps1` | Runs pretrain -> tune -> train -> analyze in its own window, logs to `logs/experiment.log`, resumes after interruptions, commits and pushes results at the end | Starting or resuming the main experiment |
 | `run.py` | Command line: `prepare`, `split`, `benchmark`, `distance`, `pretrain`, `tune`, `train`, `analyze`, `all` | You want to run anything |
 | `config.yaml` | All settings of the main experiment (datasets, models, budgets, seeds, MAE, training) | You want to know or change a setting |
 | `configs/smoke.yaml` | Tiny settings for a few-minute end-to-end test (results meaningless) | Checking the code works |

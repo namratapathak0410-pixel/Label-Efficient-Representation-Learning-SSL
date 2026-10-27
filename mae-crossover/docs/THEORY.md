@@ -316,8 +316,9 @@ ratios make it impossible. We keep the standard value (one recipe for all domain
 **Position embeddings.** MAE starts the encoder's position embeddings from fixed 2-D sine-cosine patterns (a smooth
 encoding of row and column), as in the original.
 
-**Schedule.** 400 epochs over ~4,900 images, batch 256 -> ~19 steps per epoch, **~7,600 steps**. Learning rate
-blr x batch / 256 = 1.5e-4 x 256 / 256 = **1.5e-4**, 20 warm-up epochs, then cosine decay; AdamW with
+**Schedule.** 800 epochs over ~5,000 images, batch 256 -> 19 steps per epoch, **15,200 steps** (~22 min each on
+the RTX 4050 at 85 ms/step; originally 400 epochs, raised to 800 before training - amendment 1). Learning rate
+blr x batch / 256 = 1.5e-4 x 256 / 256 = **1.5e-4**, 40 warm-up epochs, then cosine decay; AdamW with
 betas (0.9, 0.95) and weight decay 0.05 (He et al.). Augmentation: random resized crop (scale 0.2-1) + flip only.
 
 **Why the same epochs everywhere.** All datasets have the same number of training images, so 400 epochs = the same
@@ -417,7 +418,7 @@ Hardware: NVIDIA RTX 4050 Laptop GPU, 6 GB, Ada architecture (supports bfloat16)
 
 | Item | Count | Notes |
 |---|---|---|
-| MAE pretrainings | 12 | ~7,600 steps each, encoder on 26 tokens |
+| MAE pretrainings | 12 | 15,200 steps each (~22 min), encoder on 26 tokens |
 | LR selection runs | 48 | at the 20 % budget, seed 0 |
 | Main fine-tuning runs | 240 | 600-4,000 steps each, early stopping |
 | GPU memory | dataset ~0.54 GB + model/activations | well within 6 GB |
@@ -434,5 +435,5 @@ Exact timings come from `python run.py benchmark` (`results/crossover_v1/benchma
 - 3 seeds give wide confidence intervals.
 - The labelled validation set (~1,050 images) is larger than the smallest training budgets; this is unrealistic for
   true low-label settings but identical for every arm, so the comparison stays fair.
-- One MAE recipe (75 % mask, 400 epochs); no search over MAE settings.
+- One MAE recipe (75 % mask, 800 epochs); no search over MAE settings.
 - PlantVillage has lab backgrounds and is known to be "easy"; it may not reflect field conditions.

@@ -6,3 +6,4 @@ results/smoke/
 __pycache__/
 *.pyc
 *.log
+logs/

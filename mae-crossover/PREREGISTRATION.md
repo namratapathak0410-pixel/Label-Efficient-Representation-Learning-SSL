@@ -40,6 +40,7 @@ validation macro-F1. Layer-wise lr decay 0.75 for C and E. Augmentation for all 
 at the 20 % budget, seed 0, from {5e-4, 1e-3, 2e-3} (scratch) or {2.5e-4, 5e-4, 1e-3} (pretrained).
 MAE: mask 75 %, decoder 2 blocks x 128-d, norm-pixel loss, 400 epochs over the ~4,900 train images, batch 256,
 lr 1.5e-4 x 256/256, wd 0.05, 20 warm-up epochs. Identical MAE compute in every domain.
+(**Amended to 800 epochs / 40 warm-up epochs before training - see Amendments.**)
 
 ## Domain distance (computed from frozen ImageNet features before training)
 Reference: ImageNetV2 matched-frequency. Measures: FID, OTDD (diagonal-Gaussian label cost, 64-d PCA),
@@ -65,6 +66,17 @@ mean ImageNet max-softmax confidence, linear-probe validation accuracy.
   for macro-F1, ECE and ECE after temperature scaling (temperature fitted on validation only).
 - Secondary metrics: accuracy, macro precision/recall, minimum class recall, NLL, Brier, ECE (15 bins), adaptive ECE.
 - All results, including those that contradict the hypotheses, are reported.
+
+## Amendments (made before any main-experiment training)
+| # | Date (IST) | Change | Reason | Results existing at the time |
+|---|---|---|---|---|
+| 1 | 2026-10-27 ~16:55 | MAE pretraining 400 -> **800 epochs**, warm-up 20 -> **40 epochs** (~15,200 steps per pretraining) | The speed benchmark showed the full plan needs ~16 h worst case of the 48 h; 800 epochs is the standard MAE schedule and avoids under-training arm E. Chosen by Soham | Only the smoke test (meaningless by design) and the domain distances (fixed, unaffected by this change). No MAE pretraining or main fine-tuning run had started |
+
+## Domain distances as measured (recorded before training)
+FID / OTDD / ImageNet confidence / linear-probe accuracy: PlantVillage 433.3 / 30.62 / 0.298 / 0.899;
+CIFAR-10 266.5 / 28.25 / 0.294 / 0.833; EuroSAT 318.1 / 26.42 / 0.139 / 0.858; Pets 272.9 / 29.30 / 0.510 / 0.861.
+The measures do not agree on the ordering (e.g. OTDD places EuroSAT closest, ImageNet confidence farthest); H2 is
+therefore evaluated separately for each measure, as planned.
 
 ## Known limitations declared in advance
 Small ViT and 160 px (compute budget: one RTX 4050 Laptop GPU, 6 GB, 48 h); DeiT weights were trained at 224 px;

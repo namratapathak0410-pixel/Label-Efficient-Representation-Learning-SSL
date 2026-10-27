@@ -27,8 +27,8 @@ models:
 
 mae:
   per_seed: true             # a separate MAE pretraining per seed, so E's variance includes pretraining
-  epochs: 400
-  warmup_epochs: 20
+  epochs: 800                # amendment 1 (was 400): MAE paper standard; fits the 48 h budget
+  warmup_epochs: 40
   batch_size: 256
   blr: 1.5e-4                # lr = blr * batch / 256 (He et al. 2022)
   weight_decay: 0.05

@@ -22,7 +22,7 @@ The pipeline order is `prepare -> split -> benchmark -> distance -> pretrain -> 
 - **Why before training:** the distance must be fixed before we see any result, so it cannot be chosen to fit the outcome. This measured distance is the "can we predict it" part of the novelty.
 
 ## 5. `pretrain`: MAE on the unlabelled training images
-- **What:** hides 75 % of each image's 16x16 patches and trains the ViT to redraw them; 400 passes over the ~4,900 training images; one pretraining per seed.
+- **What:** hides 75 % of each image's 16x16 patches and trains the ViT to redraw them; 800 passes over the ~5,000 training images (raised from 400 before training, amendment 1); one pretraining per seed.
 - **Why only training images:** using validation or test images (even without labels) would leak information about the test set.
 - **Why identical settings in every domain:** same compute and same recipe, so the domain is the only thing that changes.
 
