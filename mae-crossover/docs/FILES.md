@@ -48,6 +48,15 @@
 | `THEORY.md` | Full theory: problem, related work, design, data flow, ResNet/ViT/MAE internals with every number explained, metrics, distances, statistics, limitations |
 | `FINDINGS.md` | Results of the main experiment in plain English, verdict on each hypothesis, post-hoc observations clearly marked |
 
+### `mae-crossover/paper/` (IEEE paper)
+| File | What |
+|---|---|
+| `main.tex` | The paper, IEEE conference format, two columns |
+| `refs.bib` | 34 references, each checked against arXiv or the publisher |
+| `make_figures.py` | Generates all figures (`figures/*.pdf`) and data tables (`tables/*.tex`) from the results |
+| `README.md` | How to rebuild the figures and compile, locally or on Overleaf |
+| `overleaf_upload.zip` | Ready-to-upload Overleaf project (made locally, not in git) |
+
 ### Created when running (not in git unless noted)
 | Path | What |
 |---|---|

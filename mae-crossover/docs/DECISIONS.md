@@ -33,3 +33,7 @@ If a decision changes later, the old row stays and a new row is added (so the hi
 | 26 | 10-27 | Keep the 78-image EuroSAT duplicate group | Claude | They are featureless sea/lake patches that genuinely look identical; keeping them together in one split is the conservative (leakage-safe) choice |
 | 27 | 10-27 | Spend spare time on **MAE 800 epochs** (was 400); keep 3 seeds, 160 px, no extra arm | Soham (offered: 5 seeds, MAE 800, compute-matched scratch ViT, 224 px) | Benchmark showed ~16 h worst case of 48 h. 800 epochs is the MAE standard and avoids under-training E. Recorded as pre-registration amendment 1 before any training |
 | 28 | 10-27 | Run the experiment from `run_experiment.ps1` in its own PowerShell window | Claude | The first download was killed when the Claude session ended; a separate window survives that. The script resumes after any interruption and pushes results at the end |
+| 29 | 10-28 | Paper framed as a pre-registered negative result ("Does in-domain MAE overtake ImageNet...?") | Soham | It is the clear, honest answer from the data |
+| 30 | 10-28 | Post-hoc crossover extrapolation (FINDINGS.md section 3) left out of the paper; all 4 arms kept | Soham | Only pre-registered analyses in the paper |
+| 31 | 10-28 | Paper author: Namrata Pathak, M.Tech AI & DS, KIIT University | Soham | As given by Soham; co-authors can be added in `main.tex` |
+| 32 | 10-28 | Gokten et al. 2026 and Wang et al. 2024 (Agronomy) not cited | Claude | Could not be verified; only checked references are cited |

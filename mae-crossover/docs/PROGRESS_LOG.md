@@ -60,7 +60,11 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 07:27 | `analyze` done; `run_experiment.ps1` auto-committed and pushed the results. Whole experiment 16:50 -> 07:27 = **14.6 h** (planned worst case ~18 h) | `c3ff9cb` |
 | 07:40 | Read the results against the pre-registered hypotheses; wrote `docs/FINDINGS.md`. Short version: ImageNet ViT wins every cell, the MAE gap shrinks with labels in every domain but never crosses (H1 partly, H4 rejected), MAE > scratch ViT (H3 mostly), MAE ~ ResNet scratch | this commit |
 
+| ~08:00-11:30 | Walked Soham through the whole project, part by part (problem, arms, data, distances, MAE, fine-tuning, running) | - |
+| ~11:30 | Wrote the IEEE two-column paper in `paper/`. All figures and data tables are generated from the results by `paper/make_figures.py`, and all 34 references were checked against arXiv or the publisher. Not yet compiled: there is no LaTeX on the laptop, and installing Tectonic was blocked by the permission system, so it was checked statically instead (braces, environments, citations, labels, files) | this commit |
+
 ## Next
-1. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.
+1. Compile the paper (Overleaf zip, or allow a local LaTeX install) and check that it is 5-7 pages
+2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.
 2. Decide with Soham how to present the post-hoc extrapolation (FINDINGS.md section 3) and whether any follow-up is worth running in the remaining time.
 3. Thesis write-up: methods from PREREGISTRATION.md and THEORY.md, results from REPORT.md and FINDINGS.md.
