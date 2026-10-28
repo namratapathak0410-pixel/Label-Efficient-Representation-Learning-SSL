@@ -39,7 +39,7 @@ def paths(cfg: dict) -> dict:
     p = dict(
         raw=ROOT / "data" / "raw",
         cache=ROOT / "data" / "cache" / f"{cfg['img_size']}px",
-        splits=ROOT / "results" / exp / "splits",
+        splits=ROOT / "results" / cfg.get("splits_from", exp) / "splits",  # v2 reads v1's identical splits
         ckpt=ROOT / "checkpoints" / exp,
         runs=ROOT / "results" / exp / "runs",
         results=ROOT / "results" / exp,

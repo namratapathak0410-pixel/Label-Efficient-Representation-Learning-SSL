@@ -17,10 +17,9 @@ import torch
 import torch.nn as nn
 from timm.models.vision_transformer import Block
 
-from .data import load_cache
+from .pool import unlabelled_images
 from .gpu_data import GPUImages
 from .models import create_vit, mae_encoder_path
-from .split import make_split
 from .utils import device, get_logger, resolved_datasets, set_seed, write_json
 
 log = get_logger()
@@ -41,15 +40,17 @@ def sincos_2d(dim, grid):
 
 
 class MAE(nn.Module):
-    def __init__(self, encoder, decoder_dim, decoder_depth, decoder_heads, mask_ratio, norm_pix_loss=True):
+    def __init__(self, encoder, decoder_dim, decoder_depth, decoder_heads, mask_ratio, norm_pix_loss=True,
+                 reset_pos_embed=True):
         super().__init__()
         self.encoder = encoder
         self.patch = encoder.patch_embed.patch_size[0]
         self.grid = encoder.patch_embed.grid_size[0]
         self.mask_ratio, self.norm_pix_loss = mask_ratio, norm_pix_loss
         dim = encoder.embed_dim
-        with torch.no_grad():
-            encoder.pos_embed.copy_(sincos_2d(dim, self.grid))
+        if reset_pos_embed:  # not for an ImageNet-initialised encoder: its learned position embeddings are kept
+            with torch.no_grad():
+                encoder.pos_embed.copy_(sincos_2d(dim, self.grid))
         self.decoder_embed = nn.Linear(dim, decoder_dim)
         self.mask_token = nn.Parameter(torch.zeros(1, 1, decoder_dim))
         self.register_buffer("decoder_pos", sincos_2d(decoder_dim, self.grid))
@@ -136,30 +137,36 @@ def save_reconstructions(model, imgs, mean, std, path):
     plt.close(fig)
 
 
-def pretrain_one(cfg: dict, dataset: str, seed: int, max_steps: int | None = None) -> dict:
-    enc_path = mae_encoder_path(cfg, dataset, seed)
+def pretrain_one(cfg: dict, dataset: str, seed: int, max_steps: int | None = None, variant: str = "mae") -> dict:
+    """variant 'mae': v1 (train images only, 800 epochs). 'mae_big' / 'imagenet_mae': experiment 2 (20k pool,
+    cfg.pool.steps optimiser steps; imagenet_mae starts from the ImageNet weights and keeps their position embeddings)."""
+    enc_path = mae_encoder_path(cfg, dataset, seed, variant)
     out = enc_path.parent
     out.mkdir(parents=True, exist_ok=True)
     if enc_path.exists() and max_steps is None:
         return {}
     mc, dev = cfg["mae"], device()
     set_seed(1000 + seed)
-    df = make_split(dataset, cfg)
-    c = load_cache(dataset, cfg)
-    tr_idx = df.loc[df.split == "train", "idx"].to_numpy()  # unlabelled pool = train split only
-    data = GPUImages(c["images"][tr_idx], np.zeros(len(tr_idx), dtype=np.int64), dev)  # labels are NOT given
-    encoder = create_vit(cfg, num_classes=0)
-    model = MAE(encoder, mc["decoder_dim"], mc["decoder_depth"], mc["decoder_heads"], mc["mask_ratio"]).to(dev)
+    big = variant != "mae"
+    vc = cfg["mae_variants"][variant] if big else {}
+    use_pool = big and dataset in [resolved_datasets(cfg)[s] for s in vc["pool_slots"] if s in cfg["pool"]["extra_slots"]]
+    imgs = unlabelled_images(cfg, dataset, use_pool)  # train split (+ extras); never val/test
+    data = GPUImages(imgs, np.zeros(len(imgs), dtype=np.int64), dev)  # labels are NOT given
+    from_imagenet = big and vc["init"] == "imagenet"
+    encoder = create_vit(cfg, num_classes=0, pretrained=from_imagenet)
+    model = MAE(encoder, mc["decoder_dim"], mc["decoder_depth"], mc["decoder_heads"], mc["mask_ratio"],
+                reset_pos_embed=not from_imagenet).to(dev)
     decay, no_decay = [], []
     for n_, p in model.named_parameters():
         (no_decay if p.ndim <= 1 or any(k in n_ for k in ("pos_embed", "cls_token", "mask_token")) else decay).append(p)
     bs = mc["batch_size"]
-    base_lr = mc["blr"] * bs / 256
+    base_lr = (vc["blr"] if big else mc["blr"]) * bs / 256
     opt = torch.optim.AdamW([{"params": decay, "weight_decay": mc["weight_decay"]},
                              {"params": no_decay, "weight_decay": 0.0}], lr=base_lr, betas=(0.9, 0.95), fused=True)
     spe = max(1, len(data) // bs)
-    total = mc["epochs"] * spe if max_steps is None else max_steps
-    warm = min(mc["warmup_epochs"] * spe, total // 10)
+    full = cfg["pool"]["steps"] if big else mc["epochs"] * spe
+    total = full if max_steps is None else max_steps
+    warm = min(cfg["pool"]["warmup_steps"] if big else mc["warmup_epochs"] * spe, total // 10)
     gen = torch.Generator(device=dev).manual_seed(1000 + seed)
     last = out / "last.pt"
     step, hist, elapsed = 0, [], 0.0
@@ -168,8 +175,8 @@ def pretrain_one(cfg: dict, dataset: str, seed: int, max_steps: int | None = Non
         model.load_state_dict(ck["model"]); opt.load_state_dict(ck["opt"])
         step, hist, elapsed = ck["step"], ck["hist"], ck["elapsed"]
         log.info("[%s] resuming MAE seed %d at step %d/%d", dataset, seed, step, total)
-    log.info("[%s] MAE seed %d: %d unlabelled train images, %d steps (%d epochs), mask %.2f", dataset, seed, len(data),
-             total, total // spe, mc["mask_ratio"])
+    log.info("[%s] MAE %s seed %d: %d unlabelled images, %d steps (%d epochs), mask %.2f, lr %.2g", dataset, variant,
+             seed, len(data), total, total // spe, mc["mask_ratio"], base_lr)
     model.train()
     torch.cuda.synchronize(); t0 = time.perf_counter()
     losses = []
@@ -192,15 +199,15 @@ def pretrain_one(cfg: dict, dataset: str, seed: int, max_steps: int | None = Non
                 hist.append(dict(step=step, epoch=step / spe, loss=float(torch.stack(losses).mean())))
                 losses = []
                 ep = step // spe
-                if max_steps is None and (ep % max(1, mc["epochs"] // 10) == 0 or step == total):
-                    log.info("[%s] MAE epoch %d/%d loss %.4f", dataset, ep, mc["epochs"], hist[-1]["loss"])
+                if max_steps is None and (ep % max(1, (total // spe) // 10) == 0 or step == total):
+                    log.info("[%s] MAE %s epoch %d/%d loss %.4f", dataset, variant, ep, total // spe, hist[-1]["loss"])
                 if max_steps is None and ep % 50 == 0:
                     torch.cuda.synchronize()
                     torch.save(dict(model=model.state_dict(), opt=opt.state_dict(), step=step, hist=hist,
                                     elapsed=elapsed + time.perf_counter() - t0), last)
     torch.cuda.synchronize()
     elapsed += time.perf_counter() - t0
-    info = dict(dataset=dataset, seed=seed, steps=total, epochs=total / spe, n_unlabelled=len(data),
+    info = dict(dataset=dataset, variant=variant, seed=seed, steps=total, epochs=total / spe, n_unlabelled=len(data),
                 batch_size=bs, base_lr=base_lr, mask_ratio=mc["mask_ratio"], decoder_depth=mc["decoder_depth"],
                 decoder_dim=mc["decoder_dim"], pretrain_seconds=elapsed, images_per_second=total * bs / elapsed,
                 final_loss=hist[-1]["loss"] if hist else None, uses_labels=False, uses_val_or_test=False,
@@ -216,7 +223,7 @@ def pretrain_one(cfg: dict, dataset: str, seed: int, max_steps: int | None = Non
     except Exception as e:  # a figure must never lose a finished pretraining
         log.warning("reconstruction figure failed: %s", e)
     last.unlink(missing_ok=True)
-    log.info("[%s] MAE seed %d done in %.1f min -> %s", dataset, seed, elapsed / 60, enc_path)
+    log.info("[%s] MAE %s seed %d done in %.1f min -> %s", dataset, variant, seed, elapsed / 60, enc_path)
     del model, data
     torch.cuda.empty_cache()
     return info

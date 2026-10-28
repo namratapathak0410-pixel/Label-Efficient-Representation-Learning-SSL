@@ -13,11 +13,16 @@ import timm
 import torch
 
 ARMS = {
-    "A_cnn_scratch": dict(family="cnn", init="scratch", label="ResNet scratch"),
+    "A_cnn_scratch": dict(family="cnn", init="scratch", label="ResNet-18 scratch", arch="resnet18"),
     "C_vit_imagenet": dict(family="vit", init="imagenet", label="ViT ImageNet-1k"),
     "D_vit_scratch": dict(family="vit", init="scratch", label="ViT scratch"),
     "E_vit_mae": dict(family="vit", init="mae", label="ViT target-MAE"),
+    # experiment 2 (PREREGISTRATION_V2.md)
+    "A2_cnn34_scratch": dict(family="cnn", init="scratch", label="ResNet-34 scratch", arch="resnet34"),
+    "E2_vit_mae_big": dict(family="vit", init="mae_big", label="ViT MAE (20k pool)", variant="mae_big"),
+    "F_vit_imagenet_mae": dict(family="vit", init="imagenet_mae", label="ViT ImageNet+MAE", variant="imagenet_mae"),
 }
+PRETRAINED_INITS = ("imagenet", "mae", "mae_big", "imagenet_mae")  # get layer-wise lr decay and the pretrained lr grid
 
 
 def create_vit(cfg: dict, num_classes: int, pretrained: bool = False, drop_path: float = 0.0):
@@ -26,24 +31,29 @@ def create_vit(cfg: dict, num_classes: int, pretrained: bool = False, drop_path:
                              drop_path_rate=drop_path, global_pool=m["vit_pool"], fc_norm=False)
 
 
-def mae_encoder_path(cfg: dict, dataset: str, seed: int) -> Path:
+def mae_encoder_path(cfg: dict, dataset: str, seed: int, variant: str = "mae") -> Path:
+    """variant 'mae' = v1's 5k-image MAE (shared with v1); 'mae_big' / 'imagenet_mae' = experiment 2's 20k-pool MAE."""
     from .utils import paths
 
     s = seed if cfg["mae"]["per_seed"] else 0
-    return paths(cfg)["ckpt"] / dataset / f"mae_seed{s}" / "encoder.pt"
+    if variant == "mae":
+        root = paths(cfg)["ckpt"].parent / cfg["mae"].get("ckpt_experiment", cfg["experiment"])
+        return root / dataset / f"mae_seed{s}" / "encoder.pt"
+    return paths(cfg)["ckpt"] / dataset / f"{variant}_seed{s}" / "encoder.pt"
 
 
 def build(arm: str, cfg: dict, num_classes: int, dataset: str, seed: int):
     a = ARMS[arm]
     dp = cfg["models"]["vit_drop_path"]
     if a["family"] == "cnn":
-        return timm.create_model(cfg["models"]["cnn_arch"], pretrained=False, num_classes=num_classes), {}
+        return timm.create_model(a.get("arch", cfg["models"]["cnn_arch"]), pretrained=False,
+                                 num_classes=num_classes), {}
     if a["init"] == "imagenet":
         model = create_vit(cfg, num_classes, pretrained=True, drop_path=dp)  # raises if weights cannot load
         return model, {"weights": cfg["models"]["vit_arch"] + " (timm, ImageNet-1k)"}
     model = create_vit(cfg, num_classes, pretrained=False, drop_path=dp)
-    if a["init"] == "mae":
-        p = mae_encoder_path(cfg, dataset, seed)
+    if a["init"] in ("mae", "mae_big", "imagenet_mae"):
+        p = mae_encoder_path(cfg, dataset, seed, a.get("variant", "mae"))
         if not p.exists():
             raise FileNotFoundError(f"MAE encoder missing: {p} (run `pretrain` first)")
         sd = torch.load(p, map_location="cpu")
@@ -61,7 +71,7 @@ def n_params(model) -> int:
 
 def param_groups(model, arm: str, cfg: dict, lr: float, wd: float):
     """AdamW groups: no weight decay on biases/norms/tokens; layer-wise lr decay for pretrained ViTs (C and E)."""
-    ld = cfg["train"]["layer_decay"] if ARMS[arm]["init"] in ("imagenet", "mae") else 1.0
+    ld = cfg["train"]["layer_decay"] if ARMS[arm]["init"] in PRETRAINED_INITS else 1.0
     depth = len(model.blocks) if hasattr(model, "blocks") else 0
     groups = {}
     for n, p in model.named_parameters():

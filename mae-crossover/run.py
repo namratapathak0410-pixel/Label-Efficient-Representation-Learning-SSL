@@ -10,6 +10,11 @@
   python run.py analyze     tables, plots, REPORT.md
   python run.py all         everything above in order
 
+Experiment 2 (use --config config_v2.yaml):
+  python run.py pool        build the 20,000-image unlabelled pools (E2, F)
+  python run.py v2          pool -> MAE seed 0 -> tune -> grid, with an overall time-left estimate in the log
+  python run.py analyze2    tables, plots and REPORT_V2.md for the 7-arm experiment
+
 Add --config configs/smoke.yaml for a quick end-to-end test.
 """
 from __future__ import annotations
@@ -70,7 +75,7 @@ def benchmark(cfg):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("stage", choices=["prepare", "split", "benchmark", "distance", "pretrain", "tune", "train",
-                                      "analyze", "all"])
+                                      "analyze", "all", "pool", "v2", "analyze2"])
     ap.add_argument("--config", default="config.yaml")
     ap.add_argument("--seeds", type=int, nargs="*")
     ap.add_argument("--datasets", nargs="*")
@@ -102,6 +107,15 @@ def main():
         elif st == "train":
             from mc.train import grid
             grid(cfg, a.seeds, a.datasets, a.arms, a.budgets)
+        elif st == "pool":
+            from mc.pool import build_all
+            build_all(cfg)
+        elif st == "v2":
+            from mc.pipeline2 import run
+            run(cfg)
+        elif st == "analyze2":
+            from mc.analyze2 import analyze2
+            analyze2(cfg)
         elif st == "analyze":
             from mc.analyze import analyze
             analyze(cfg)

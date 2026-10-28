@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import copy
 import math
+import shutil
 import time
 
 import numpy as np
@@ -21,9 +22,9 @@ import torch.nn.functional as F
 from .data import load_cache
 from .gpu_data import GPUImages
 from .metrics import evaluate_logits, full_report, per_class
-from .models import ARMS, build, n_params, param_groups
+from .models import ARMS, PRETRAINED_INITS, build, n_params, param_groups
 from .split import budget_indices, make_split
-from .utils import device, get_logger, paths, read_json, resolved_datasets, set_seed, write_json
+from .utils import ROOT, device, get_logger, paths, read_json, resolved_datasets, set_seed, write_json
 
 log = get_logger()
 
@@ -64,12 +65,32 @@ def run_id(dataset, arm, budget, seed, tag="main"):
     return f"{tag}__{dataset}__{arm}__b{budget:g}__s{seed}"
 
 
+def reuse_run(cfg, rid: str, lr: float):
+    """Copy a finished run of the earlier experiment (cfg.reuse_from) if it used exactly this learning rate.
+    Identical data, split, labelled subset, seed and protocol, so the run is the same experiment, not a new one."""
+    src_exp = cfg.get("reuse_from")
+    if not src_exp:
+        return None
+    src = ROOT / "results" / src_exp / "runs" / rid
+    if not (src / "metrics.json").exists():
+        return None
+    m = read_json(src / "metrics.json")
+    if abs(m["lr"] - lr) > 1e-12:
+        return None
+    shutil.copytree(src, paths(cfg)["runs"] / rid)
+    return m
+
+
 def train_one(cfg, data: Data, arm: str, budget: float, seed: int, lr: float, tag: str = "main",
               evaluate_test: bool = True, max_steps: int | None = None) -> dict:
     rid = run_id(data.name, arm, budget, seed, tag)
     out = paths(cfg)["runs"] / rid
     if (out / "metrics.json").exists() and max_steps is None:
         return read_json(out / "metrics.json")
+    if max_steps is None:
+        m = reuse_run(cfg, rid, lr)
+        if m is not None:
+            return m
     t_cfg, dev = cfg["train"], device()
     set_seed(seed)
     lab = torch.tensor(budget_indices(data.df, budget, seed), device=dev)
@@ -156,7 +177,7 @@ def tune(cfg, datasets=None, arms=None):
             key = f"{name}|{arm}"
             if key in choice:
                 continue
-            grid = t["lr_grid"]["pretrained" if ARMS[arm]["init"] in ("imagenet", "mae") else "scratch"]
+            grid = t["lr_grid"]["pretrained" if ARMS[arm]["init"] in PRETRAINED_INITS else "scratch"]
             scores = {}
             for lr in grid:
                 r = train_one(cfg, data, arm, t["tune_budget"], 0, lr, tag=f"tune-lr{lr:g}", evaluate_test=False)
