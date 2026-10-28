@@ -8,3 +8,7 @@ __pycache__/
 *.log
 logs/
 paper/overleaf_upload.zip
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.out

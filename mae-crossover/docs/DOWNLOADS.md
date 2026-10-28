@@ -49,3 +49,10 @@ original releases directly (no account, verified checksums). The Kaggle copies a
 | 10-27 16:10 | EuroSAT | OK |
 | 10-27 16:17 | Oxford Pets | OK, 0 unreadable images |
 | 10-27 16:17 | ImageNetV2 | interrupted (Claude session ended), restarted ~16:40 |
+| 10-28 11:09 | Tectonic 0.15 (LaTeX engine, session temp folder) | Downloaded, but fails on Windows while setting up its LaTeX format (`expl3` error), so not used |
+| 10-28 ~11:40 | TinyTeX v2026.03 (TeX Live 2025), zip release, installed by Soham into `%APPDATA%\TinyTeX` | OK. The default `.exe` release was blocked by Windows Smart App Control; the `.zip` release works |
+| 10-28 ~11:45 | LaTeX packages `ieeetran multirow pgf cite courier` via `tlmgr`, from the TeX Live 2025 archive (`ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final`) | OK. The current repository is TeX Live 2026 and refuses the older install |
+| 10-28 ~11:50 | `pypdfium2` (pip, into `.venv`) to render PDF pages for checking the layout | OK. `pymupdf` was tried first and removed because Smart App Control blocks its DLL |
+
+## Compiling the paper
+`%APPDATA%\TinyTeX\bin\windows\pdflatex.exe` main, then `bibtex.exe main`, then `pdflatex` twice (run in `paper/`).

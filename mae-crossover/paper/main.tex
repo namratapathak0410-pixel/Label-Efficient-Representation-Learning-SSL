@@ -12,6 +12,10 @@
 
 % Figures and data tables are generated from the experiment results by make_figures.py
 \graphicspath{{figures/}}
+% the primitive \input is expandable, so generated table rows can be read inside a tabular
+\makeatletter
+\newcommand{\tabinput}[1]{\@@input #1 }
+\makeatother
 
 \begin{document}
 
@@ -122,7 +126,7 @@ single benchmark may not replicate, which motivates our multi-domain design and 
   arr/.style={-{Stealth[length=4pt]}, semithick}]
 \node[box=blue!6]   (data)   at (0,0)     {4 domains\\PlantVillage, EuroSAT,\\CIFAR-10, Oxford Pets};
 \node[box]          (samp)   at (3.05,0)  {Stratified sample\\7,000 images / domain\\resized to 160$\times$160};
-\node[box]          (split)  at (6.1,0)   {Leakage-safe split\\dHash duplicate groups\\train 5k / val 1k / test 1k};
+\node[box]          (split)  at (6.1,0)   {Leakage-safe split\\dHash duplicate groups\\train / val / test\\5,000 / 1,000 / 1,000};
 \node[box]          (bud)    at (9.15,0)  {Nested label budgets\\5, 10, 20, 50, 100\,\%\\3 seeds};
 \node[box=orange!8] (dist)   at (12.2,0)  {Domain distance\\frozen ImageNet ViT\\vs.\ ImageNetV2};
 \node[box=green!8]  (mae)    at (3.05,-1.9) {MAE pretraining (E)\\train images, no labels\\75\,\% mask, 800 epochs};
@@ -134,7 +138,7 @@ single benchmark may not replicate, which motivates our multi-domain design and 
 \draw[arr] (samp) -- (split);
 \draw[arr] (split) -- (bud);
 \draw[arr] (samp.north) -- ++(0,0.35) -| (dist.north);
-\draw[arr] (split.south) -- ++(0,-0.25) -| node[pos=0.25, above, font=\tiny] {train, unlabelled} (mae.north);
+\draw[arr] (split.south) -- ++(0,-0.25) -| node[pos=0.4, above=1pt, font=\tiny] {train, unlabelled} (mae.north);
 \draw[arr] (mae) -- (init);
 \draw[arr] (init) -- (ft);
 \draw[arr] (bud) -- node[right, font=\tiny] {labels} (ft);
@@ -186,7 +190,7 @@ the direction that means ``farther from ImageNet''.}
 Dataset & Domain & Classes & Native px & Train/Val/Test & Dup.\ groups & FID $\uparrow$ & OTDD $\uparrow$ &
 ImageNet conf.\ $\downarrow$ & Linear probe $\downarrow$ \\
 \midrule
-\input{tables/datasets.tex}
+\tabinput{tables/datasets.tex}
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -211,8 +215,8 @@ random resized crop 0.2--1 and horizontal flip). Pretraining is repeated for eac
 takes $\sim$21.5\,min each, and uses neither labels nor validation or test images.
 
 \subsection{Fine-tuning protocol}
-All arms use the same protocol (Table~\ref{tab:setup}). The number of steps scales with the labelled set,
-$\mathrm{clip}(100\lceil n/128\rceil, 600, 4000)$. Validation macro-F1 is evaluated 25 times per run, training
+All arms follow the protocol in Table~\ref{tab:setup}, in which the number of training steps grows with the
+size $n$ of the labelled set. Validation macro-F1 is evaluated 25 times per run, training
 stops after 8 evaluations without improvement, and the best-validation weights are restored before the single test
 evaluation. For the pretrained ViTs (C, E) we use layer-wise learning-rate decay of 0.75~\cite{bao2022beit}, so
 earlier blocks change less. The learning rate is chosen per dataset and arm from three values, on validation
@@ -225,7 +229,7 @@ macro-F1, at the 20\,\% budget with seed 0, and then reused for every budget and
 \footnotesize
 \begin{tabular}{@{}ll@{}}
 \toprule
-Optimiser & AdamW~\cite{loshchilov2019adamw}, wd 0.05 (none on norms, biases)\\
+Optimiser & AdamW~\cite{loshchilov2019adamw}, weight decay 0.05 \\
 Batch / precision & 128 / bf16, gradient clipping 1.0 \\
 Schedule & 5\,\% linear warm-up, cosine decay \\
 Steps & $\mathrm{clip}(100\lceil n/128\rceil, 600, 4000)$ \\
@@ -292,7 +296,7 @@ $^{*}$95\,\% CI excludes 0.}
 \toprule
  & \% & A: CNN scr. & C: ViT IN & D: ViT scr. & E: ViT MAE & E$-$C \\
 \midrule
-\input{tables/macro_f1.tex}
+\tabinput{tables/macro_f1.tex}
 \bottomrule
 \end{tabular}
 \end{table}
@@ -319,7 +323,7 @@ axis. Ranges are over the five budgets; ``sig.'' counts budgets whose 95\,\% CI 
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Dataset & mean gap & crossover & range & sig. & range & sig. \\
 \midrule
-\input{tables/pairwise.tex}
+\tabinput{tables/pairwise.tex}
 \bottomrule
 \end{tabular}
 \end{table}
@@ -357,7 +361,7 @@ mean of the other datasets.}
 \toprule
 Distance & Pred. & $\rho$ & exact $p$ & LOO error & baseline \\
 \midrule
-\input{tables/association.tex}
+\tabinput{tables/association.tex}
 \bottomrule
 \end{tabular}
 \end{table}
@@ -396,7 +400,7 @@ $p$, per budget.}
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Budget \% & $W$ & $p$ & $W$ & $p$ & $W$ & $p$ \\
 \midrule
-\input{tables/ranking.tex}
+\tabinput{tables/ranking.tex}
 \bottomrule
 \end{tabular}
 \end{table}
@@ -414,7 +418,7 @@ Budget \% & $W$ & $p$ & $W$ & $p$ & $W$ & $p$ \\
 \caption{Pre-registered hypotheses and outcomes.}
 \label{tab:hyp}
 \scriptsize
-\begin{tabular}{@{}p{0.25cm}p{3.75cm}p{3.6cm}@{}}
+\begin{tabular}{@{}lp{3.65cm}p{3.55cm}@{}}
 \toprule
  & Hypothesis & Outcome \\
 \midrule
@@ -493,11 +497,14 @@ ViTs and more domains, which would allow the relation between domain distance an
 tested with adequate statistical power.
 
 \section*{Reproducibility}
-Code, configuration, pre-registration, split files and all run-level results are available at
-\url{https://github.com/namratapathak0410-pixel/Label-Efficient-Representation-Learning-SSL}. Models were built with
+Code, configuration, pre-registration, split files and all run-level results are available at\\
+{\footnotesize\url{https://github.com/namratapathak0410-pixel/Label-Efficient-Representation-Learning-SSL}}.\\
+Models were built with
 PyTorch and timm~\cite{wightman2019timm}. All figures and tables of this paper are generated from the result files
 by \texttt{paper/make\_figures.py}.
 
+% balance the two columns of the last page
+\IEEEtriggeratref{26}
 \bibliographystyle{IEEEtran}
 \bibliography{refs}
 

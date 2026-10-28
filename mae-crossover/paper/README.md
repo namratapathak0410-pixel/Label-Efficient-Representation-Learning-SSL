@@ -3,6 +3,7 @@
 | File | What |
 |---|---|
 | `main.tex` | The paper (IEEEtran conference class) |
+| `main.pdf` | Compiled paper (7 pages) |
 | `refs.bib` | Bibliography; every entry checked against arXiv or the publisher |
 | `make_figures.py` | Builds every figure in `figures/` and every data table in `tables/` from `results/crossover_v1/` and the MAE checkpoints, so no result number is typed by hand |
 | `figures/*.pdf` | Generated figures |
@@ -19,6 +20,7 @@ To also get PNG previews, set the environment variable `PREVIEW_DIR` to a folder
 - **Overleaf:** New Project -> Upload Project -> choose `overleaf_upload.zip`, which contains `main.tex`, `refs.bib`,
   `figures/` and `tables/`. The zip is made by the command below and is not stored in git. Compiler: pdfLaTeX.
 - **Locally**, with any TeX distribution: `pdflatex main && bibtex main && pdflatex main && pdflatex main`.
+  On this laptop TinyTeX is in `%APPDATA%\TinyTeX\bin\windows` (see `docs/DOWNLOADS.md`).
 
 To make the Overleaf zip (from `mae-crossover`):
 ```

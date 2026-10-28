@@ -63,8 +63,10 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | ~08:00-11:30 | Walked Soham through the whole project, part by part (problem, arms, data, distances, MAE, fine-tuning, running) | - |
 | ~11:30 | Wrote the IEEE two-column paper in `paper/`. All figures and data tables are generated from the results by `paper/make_figures.py`, and all 34 references were checked against arXiv or the publisher. Not yet compiled: there is no LaTeX on the laptop, and installing Tectonic was blocked by the permission system, so it was checked statically instead (braces, environments, citations, labels, files) | this commit |
 
+| ~11:50 | Added Namrata's email. Installed TinyTeX (see `DOWNLOADS.md`), compiled the paper: **7 pages, no errors or overfull boxes**. Fixed problems found in the rendered PDF: generated tables now load with the primitive `\@@input` (plain `\input` breaks inside tables in current LaTeX), Fig. 1 label position, line spacing in two places, table widths, balanced last-page columns. `paper/main.pdf` committed | this commit |
+
 ## Next
-1. Compile the paper (Overleaf zip, or allow a local LaTeX install) and check that it is 5-7 pages
+1. Namrata / Soham read the PDF and send corrections
 2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.
 2. Decide with Soham how to present the post-hoc extrapolation (FINDINGS.md section 3) and whether any follow-up is worth running in the remaining time.
 3. Thesis write-up: methods from PREREGISTRATION.md and THEORY.md, results from REPORT.md and FINDINGS.md.
