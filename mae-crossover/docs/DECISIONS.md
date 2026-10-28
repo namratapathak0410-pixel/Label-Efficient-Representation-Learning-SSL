@@ -37,3 +37,11 @@ If a decision changes later, the old row stays and a new row is added (so the hi
 | 30 | 10-28 | Post-hoc crossover extrapolation (FINDINGS.md section 3) left out of the paper; all 4 arms kept | Soham | Only pre-registered analyses in the paper |
 | 31 | 10-28 | Paper author: Namrata Pathak, M.Tech AI & DS, KIIT University | Soham | As given by Soham; co-authors can be added in `main.tex` |
 | 32 | 10-28 | Gokten et al. 2026 and Wang et al. 2024 (Agronomy) not cited | Claude | Could not be verified; only checked references are cited |
+| 33 | 10-28 | Next study = experiment 2 (bigger MAE pool, ImageNet+MAE, ResNet-34, wider lr grid), not ViT-Small | Claude proposed, Soham agreed | ViT-Small is 4x larger and would be starved by a 5,000-image MAE pool, and costs ~3x more; the real weakness of v1 was the tiny unlabelled pool |
+| 34 | 10-28 | Unlabelled pool = 20,000 images (train images + extras from outside the 7,000 sample); same 15,200 MAE steps as v1 | Soham | 4x v1's data at identical compute, so only the data changes. Extras exclude all sampled images and near-duplicates of val/test (incl. flips) |
+| 35 | 10-28 | ResNet-34 added as arm A2 next to ResNet-18 (A is not replaced) | Soham asked, Claude recommended | Keeps the finished v1 runs and paper comparable; answers "was the scratch CNN too weak?" |
+| 36 | 10-28 | Oxford Pets: no E2 (no extra images exist); F uses the 5,000-image pool | Claude | E2 on Pets would equal E |
+| 37 | 10-28 | F's MAE learning rate 5e-5 (one third of v1), **not tuned** | Claude | Avoid overwriting ImageNet features; no budget for a sweep. Declared as a limitation in `PREREGISTRATION_V2.md` |
+| 38 | 10-28 | v2 reuses v1 runs when the (dataset, arm) learning rate is unchanged by the wider grid; re-runs those cells when it changes | Claude | Same experiment, so copying is valid; saves ~9 h |
+| 39 | 10-28 | `pandas` pinned to 2.3.3 | Claude | Windows Application Control started blocking a DLL of pandas 3.1.0 |
+| 40 | 10-28 | Time-left estimate written to the log after every task (ETA lines, `logs/STATUS.txt`) | Soham | Estimate = expected seconds of every unfinished task, corrected by the measured actual/expected ratio |

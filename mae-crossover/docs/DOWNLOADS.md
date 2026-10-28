@@ -53,6 +53,8 @@ original releases directly (no account, verified checksums). The Kaggle copies a
 | 10-28 ~11:40 | TinyTeX v2026.03 (TeX Live 2025), zip release, installed by Soham into `%APPDATA%\TinyTeX` | OK. The default `.exe` release was blocked by Windows Smart App Control; the `.zip` release works |
 | 10-28 ~11:45 | LaTeX packages `ieeetran multirow pgf cite courier` via `tlmgr`, from the TeX Live 2025 archive (`ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final`) | OK. The current repository is TeX Live 2026 and refuses the older install |
 | 10-28 ~11:50 | `pypdfium2` (pip, into `.venv`) to render PDF pages for checking the layout | OK. `pymupdf` was tried first and removed because Smart App Control blocks its DLL |
+| 10-28 ~12:50 | `pandas` 3.1.0 -> **2.3.3** (pip, into `.venv`) | `import pandas` failed with "An Application Control policy has blocked this file" (pandas 3.1.0 `hashtable` DLL, which had worked on 10-27). 2.3.3 imports fine |
+| 10-28 13:06 | Extra unlabelled images for the MAE pools (PlantVillage 15,001, CIFAR-10 15,000, EuroSAT 15,000), decoded from the already-downloaded datasets | OK, `data/cache/160px/*_pool20000.npz`, ~1.2 GB each; no new download |
 
 ## Compiling the paper
 `%APPDATA%\TinyTeX\bin\windows\pdflatex.exe` main, then `bibtex.exe main`, then `pdflatex` twice (run in `paper/`).

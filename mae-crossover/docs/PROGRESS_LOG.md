@@ -65,6 +65,18 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 
 | ~11:50 | Added Namrata's email. Installed TinyTeX (see `DOWNLOADS.md`), compiled the paper: **7 pages, no errors or overfull boxes**. Fixed problems found in the rendered PDF: generated tables now load with the primitive `\@@input` (plain `\input` breaks inside tables in current LaTeX), Fig. 1 label position, line spacing in two places, table widths, balanced last-page columns. `paper/main.pdf` committed | this commit |
 
+## 2026-10-28, experiment 2
+
+| Time | What | Result / commit |
+|---|---|---|
+| ~12:30 | Discussed next steps with Soham. Rejected ViT-Small first (4x the parameters would starve on 5,000 MAE images, ~3x slower). Chose: give MAE a realistic unlabelled pool (E2), add ImageNet + in-domain MAE (F), add ResNet-34 (A2, kept next to ResNet-18, not replacing it), widen the lr grid. Soham chose a 20,000-image pool, matched optimiser steps, 3 seeds, and asked for a time-left estimate in the log | - |
+| ~12:45 | Wrote `PREREGISTRATION_V2.md` (hypotheses H6-H11) and `config_v2.yaml`, committed **before any code or training** | `77235d0` |
+| ~12:50 | `import pandas` failed: Windows Application Control now blocks `pandas 3.1.0`'s `hashtable` DLL (it worked the day before). Fixed by pinning `pandas 2.3.3` in `.venv` | see `DOWNLOADS.md` |
+| 13:05 | Built the unlabelled pools (`mc/pool.py`): PlantVillage +15,001, CIFAR-10 +15,000, EuroSAT +15,000 extra images from outside the 7,000 sample, 1.5 min. Checked: 0 ids overlap the sample; the near-duplicate filter flags a val image and its mirror; 227 EuroSAT extras removed, 0 for the others | `data/cache/160px/*_pool20000.npz`, `*_pool_info.json` |
+| 13:10 | Wrote `mc/pipeline2.py` (driver with overall time-left estimate), generalised `mae.py` / `models.py` / `train.py`; tested the whole driver end to end on tiny settings (7 arms, both MAE variants, reuse from v1): passed | `81d78ab` |
+| 13:15 | **Experiment 2 started** in its own window (`run_experiment_v2.ps1`). Plan: 273 tasks (21 MAE pretrainings, 87 tuning runs, 165 fine-tuning runs), first estimate ~18.9 h, finishing about Thu 29 Oct 08:00. Re-runs of v1 cells whose learning rate changes are added once tuning has decided. Progress lines starting with "ETA" are in `logs/experiment.log`; the latest is in `logs/STATUS.txt` | running |
+| ~13:20 | Wrote `mc/analyze2.py` and tested it on synthetic data (deleted afterwards) | - |
+
 ## Next
 1. Namrata / Soham read the PDF and send corrections
 2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.

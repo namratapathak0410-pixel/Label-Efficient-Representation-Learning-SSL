@@ -23,6 +23,11 @@ Project documentation, kept up to date as work happens: [progress log](docs/PROG
 Datasets: PlantVillage (plant disease), CIFAR-10 (objects), EuroSAT (satellite), Oxford-IIIT Pets (animals), 7,000
 images each, 160 px. Label budgets 5/10/20/50/100 %, seeds 0/1/2.
 
+### Experiment 2 (arms A2, E2, F)
+Pre-registered in [PREREGISTRATION_V2.md](PREREGISTRATION_V2.md). Adds ResNet-34 (A2), MAE on a 20,000-image unlabelled
+pool (E2) and an ImageNet ViT with continued MAE on that pool (F), and widens the learning-rate grid. Run with
+`powershell -ExecutionPolicy Bypass -File run_experiment_v2.ps1`; `logs/STATUS.txt` shows the estimated time left.
+
 ## Setup (Windows, NVIDIA GPU)
 ```powershell
 python -m venv .venv

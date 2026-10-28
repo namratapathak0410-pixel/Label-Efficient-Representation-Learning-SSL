@@ -12,6 +12,9 @@
 ## `mae-crossover/`
 | Path | What | Read it when |
 |---|---|---|
+| `run_experiment_v2.ps1` | Experiment 2: pool -> MAE seed 0 -> tune -> grid -> analysis -> push; writes ETA time-left lines to `logs/experiment.log` and `logs/STATUS.txt` | Starting or resuming experiment 2 |
+| `config_v2.yaml` | Settings of experiment 2 (7 arms, 20k pool, wider lr grid) | Changing a v2 setting |
+| `PREREGISTRATION_V2.md` | Hypotheses H6-H11 of experiment 2, committed before it ran | Writing the methods chapter |
 | `run_experiment.ps1` | Runs pretrain -> tune -> train -> analyze in its own window, logs to `logs/experiment.log`, resumes after interruptions, commits and pushes results at the end | Starting or resuming the main experiment |
 | `run.py` | Command line: `prepare`, `split`, `benchmark`, `distance`, `pretrain`, `tune`, `train`, `analyze`, `all` | You want to run anything |
 | `config.yaml` | All settings of the main experiment (datasets, models, budgets, seeds, MAE, training) | You want to know or change a setting |
@@ -28,11 +31,14 @@
 | `data.py` | Downloads each dataset (with fallbacks), draws the stratified 7,000-image sample, decodes every image once to 160x160 and saves a `.npz` cache with duplicate hashes | `prepare`, `build_cache`, `load_cache`, `dhash256` |
 | `split.py` | Finds duplicate groups, makes the leakage-safe train/val/test split, builds the nested label budgets | `make_split`, `budget_indices`, `duplicate_groups` |
 | `gpu_data.py` | Keeps a dataset in GPU memory; random crop, flip and colour jitter on the GPU | `GPUImages`, `random_resized_crop` |
-| `models.py` | Builds arms A/C/D/E; layer-wise learning-rate decay for pretrained ViTs | `ARMS`, `build`, `param_groups` |
+| `models.py` | Builds arms A/C/D/E and the experiment-2 arms A2/E2/F; layer-wise learning-rate decay for pretrained ViTs | `ARMS`, `build`, `param_groups` |
 | `mae.py` | Masked Autoencoder: model, pretraining loop, reconstruction figure | `MAE`, `pretrain_one`, `pretrain_all` |
 | `train.py` | One fine-tuning run with early stopping, learning-rate selection, the full grid | `train_one`, `tune`, `grid`, `collect` |
 | `metrics.py` | Accuracy, macro P/R/F1, min class recall, NLL, Brier, ECE, adaptive ECE, temperature scaling | `full_report`, `fit_temperature` |
 | `distance.py` | Distance between ImageNet and each dataset: FID, OTDD, ImageNet confidence, linear probe | `compute` |
+| `pool.py` | Builds the 20,000-image unlabelled pools for experiment 2 with leakage control | `build_pool`, `unlabelled_images` |
+| `pipeline2.py` | Experiment 2 driver: MAE seed 0, tuning, seed-major grid, overall time-left estimate | `run`, `Tracker` |
+| `analyze2.py` | Experiment 2 analysis: gaps for all pairs, hypotheses H6-H11, plots, `REPORT_V2.md` | `analyze2` |
 | `analyze.py` | Gap E-C, crossover, distance association, winner map, ranking agreement, plots, `REPORT.md` | `analyze` |
 
 ### `mae-crossover/docs/` (this documentation)
@@ -58,6 +64,7 @@
 | `overleaf_upload.zip` | Ready-to-upload Overleaf project (made locally, not in git) |
 
 ### Created when running (not in git unless noted)
+(Experiment 2 uses the same layout with `crossover_v2` and `mae_big_seed<k>` / `imagenet_mae_seed<k>` encoder folders; it reads v1's splits and reuses v1 runs.)
 | Path | What |
 |---|---|
 | `data/` | Raw downloads and the 160 px caches |
