@@ -1,0 +1,68 @@
+# Experiment 2: bigger unlabelled pool for MAE (E2), ImageNet + in-domain MAE (F), ResNet-34 (A2), wider lr grid.
+# Declared in PREREGISTRATION_V2.md. Everything not listed here is inherited from v1 (config.yaml) by value below.
+experiment: crossover_v2
+reuse_from: crossover_v1       # v1 runs with identical settings are copied instead of re-run
+splits_from: crossover_v1      # identical splits, so labelled subsets match v1 exactly
+img_size: 160
+n_per_dataset: 7000
+
+datasets:
+  plant:     [plantvillage, flowers102]
+  objects:   [cifar10, cifar10_kaggle, stl10]
+  satellite: [eurosat, eurosat_kaggle, dtd]
+  animals:   [pets, pets_kaggle, flowers102]
+
+split:
+  val_frac: 0.15
+  test_frac: 0.15
+  split_seed: 42
+  dhash_threshold: 10
+
+arms: [A_cnn_scratch, A2_cnn34_scratch, C_vit_imagenet, D_vit_scratch, E_vit_mae, E2_vit_mae_big, F_vit_imagenet_mae]
+
+models:
+  cnn_arch: resnet18
+  vit_arch: deit_tiny_patch16_224
+  vit_pool: avg
+  vit_drop_path: 0.1
+
+mae:                           # the v1 recipe; E reuses the v1 encoders
+  per_seed: true
+  ckpt_experiment: crossover_v1
+  epochs: 800
+  warmup_epochs: 40
+  batch_size: 256
+  blr: 1.5e-4
+  weight_decay: 0.05
+  mask_ratio: 0.75
+  decoder_dim: 128
+  decoder_depth: 2
+  decoder_heads: 4
+
+pool:                          # unlabelled pool for E2 and F
+  size: 20000
+  extra_slots: [plant, objects, satellite]   # animals (Pets) has no extra images -> pool stays train-only
+  seed: 777
+  steps: 15200                 # same optimiser steps as v1 (800 epochs x 19)
+  warmup_steps: 760
+
+mae_variants:
+  mae_big:      {init: random,   blr: 1.5e-4, pool_slots: [plant, objects, satellite]}
+  imagenet_mae: {init: imagenet, blr: 5.0e-5, pool_slots: [plant, objects, satellite, animals]}
+
+train:
+  budgets: [5, 10, 20, 50, 100]
+  seeds: [0, 1, 2]
+  batch_size: 128
+  epochs_equiv: 100
+  min_steps: 600
+  max_steps: 4000
+  eval_points: 25
+  patience: 8
+  warmup_frac: 0.05
+  weight_decay: 0.05
+  layer_decay: 0.75
+  tune_budget: 20
+  lr_grid:
+    scratch: [2.5e-4, 5.0e-4, 1.0e-3, 2.0e-3, 4.0e-3]
+    pretrained: [1.25e-4, 2.5e-4, 5.0e-4, 1.0e-3, 2.0e-3]
