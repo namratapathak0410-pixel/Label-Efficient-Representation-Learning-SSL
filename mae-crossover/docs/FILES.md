@@ -46,6 +46,7 @@
 | `NOVELTY.md` | Research gap and novelty, with the literature check |
 | `GLOSSARY.md` | ViT, MAE, ECE and other terms explained simply |
 | `THEORY.md` | Full theory: problem, related work, design, data flow, ResNet/ViT/MAE internals with every number explained, metrics, distances, statistics, limitations |
+| `FINDINGS.md` | Results of the main experiment in plain English, verdict on each hypothesis, post-hoc observations clearly marked |
 
 ### Created when running (not in git unless noted)
 | Path | What |

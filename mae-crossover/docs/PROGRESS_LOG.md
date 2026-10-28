@@ -46,9 +46,21 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 16:50 | Log file was unreadable (Windows PowerShell's Tee-Object writes UTF-16, Python appends ASCII). Stopped after ~1 min of MAE, deleted the partial MAE folder, fixed the script to write ASCII, relaunched | - |
 | 16:50 | **Main experiment running**: MAE pretraining PlantVillage seed 0, 15,200 steps. Progress in `logs/experiment.log` | running |
 | (times above 16:40 corrected to git/log timestamps; earlier entries marked ~ are approximate) | | |
+| 18:13 | MAE pretraining seed 0 done for all 4 datasets (20.5-20.6 min each, 82.5 min total) | `checkpoints/crossover_v1/*/mae_seed0/` |
+| 19:11 | Learning-rate selection done (48 runs, 58.4 min) | `results/crossover_v1/lr_choice.json` |
+| 19:11 | Main grid started (240 runs, seed-major) | - |
+| 22:21 | Seed 0 finished (runs 1-80) | - |
+
+## 2026-10-28
+
+| Time | What | Result / commit |
+|---|---|---|
+| 22:24 (10-27) - 06:47 | MAE pretraining for seeds 1 and 2 ran inside the grid, just before arm E needed each one (8 x 21.7-22.2 min) | `checkpoints/crossover_v1/*/mae_seed{1,2}/` |
+| 07:27 | Main grid done: 240/240 runs, no failures. 9.3 h of fine-tuning plus ~2.9 h of MAE | `results/crossover_v1/runs.csv` |
+| 07:27 | `analyze` done; `run_experiment.ps1` auto-committed and pushed the results. Whole experiment 16:50 -> 07:27 = **14.6 h** (planned worst case ~18 h) | `c3ff9cb` |
+| 07:40 | Read the results against the pre-registered hypotheses; wrote `docs/FINDINGS.md`. Short version: ImageNet ViT wins every cell, the MAE gap shrinks with labels in every domain but never crosses (H1 partly, H4 rejected), MAE > scratch ViT (H3 mostly), MAE ~ ResNet scratch | this commit |
 
 ## Next
-1. Finish downloads (Pets, ImageNetV2).
-2. Smoke test (`configs/smoke.yaml`) to catch bugs end to end.
-3. Speed benchmark, then lock the time plan.
-4. `split` -> `distance` -> `pretrain` -> `tune` -> `train` -> `analyze`.
+1. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.
+2. Decide with Soham how to present the post-hoc extrapolation (FINDINGS.md section 3) and whether any follow-up is worth running in the remaining time.
+3. Thesis write-up: methods from PREREGISTRATION.md and THEORY.md, results from REPORT.md and FINDINGS.md.
