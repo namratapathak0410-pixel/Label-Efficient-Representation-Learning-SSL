@@ -1,0 +1,5 @@
+dataset,mean_gap_log,crossover_budget,direction,crossover_supported_by_ci,censored,domain,fid,otdd,imagenet_confidence,linear_probe_acc,n_train,n_classes
+cifar10,-0.31711438551178667,,C ahead at every budget,False,>100,objects,266.53150710704006,28.25110199294034,0.2939121127128601,0.833,5000,10
+eurosat,-0.11036374310830525,,C ahead at every budget,False,>100,satellite,318.0898891713022,26.42337450914934,0.13917551934719086,0.858,5000,10
+pets,-0.4893479243456864,,C ahead at every budget,False,>100,animals,272.93170972783065,29.30069841888175,0.5100551843643188,0.861,5000,37
+plantvillage,-0.11754587352541927,,C ahead at every budget,False,>100,plant,433.3278473298882,30.621307942668608,0.2979103624820709,0.899,4999,38
