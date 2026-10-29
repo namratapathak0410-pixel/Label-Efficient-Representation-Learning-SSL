@@ -77,6 +77,10 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 13:15 | **Experiment 2 started** in its own window (`run_experiment_v2.ps1`). Plan: 273 tasks (21 MAE pretrainings, 87 tuning runs, 165 fine-tuning runs), first estimate ~18.9 h, finishing about Thu 29 Oct 08:00. Re-runs of v1 cells whose learning rate changes are added once tuning has decided. Progress lines starting with "ETA" are in `logs/experiment.log`; the latest is in `logs/STATUS.txt` | running |
 | ~13:20 | Wrote `mc/analyze2.py` and tested it on synthetic data (deleted afterwards) | - |
 
+| ~13:22 | The window running experiment 2 was closed and killed the job (log: "window-CLOSE event"). Relaunched hidden at 14:00; MAE resumed from its checkpoint | - |
+| 14:00 -> 10:57 (10-29) | Experiment 2 ran: 7 MAE pretrainings x 2 variants + 7 more for seeds 1-2, 135 tuning runs, 405 fine-tuning runs in total (of which part copied from v1). Learning rate changed in 9 of 16 old cells (re-run). GPU at 100 % but thermally throttled (~89 C), MAE 22.8 min instead of 21.5 | `4bb0b69` |
+| 10:57 | `analyze2` done, results pushed. Verdicts: H6, H7, H8 not supported; H9, H11 supported; H10 partly. C still wins 20/20. Written into `FINDINGS.md` | this commit |
+
 ## Next
 1. Namrata / Soham read the PDF and send corrections
 2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.

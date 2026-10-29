@@ -69,3 +69,30 @@ With ~5,000 images per domain, ImageNet initialisation beats in-domain MAE at ev
 domains. MAE's disadvantage shrinks steadily as labels grow, and it shrinks fastest in domains far from ImageNet:
 PlantVillage at 100 % labels is within 2 F1 points. MAE clearly beats a scratch ViT and roughly matches a
 scratch ResNet-18.
+
+---
+
+# Experiment 2 (pre-registered in `PREREGISTRATION_V2.md`; numbers from `results/crossover_v2/REPORT_V2.md`)
+
+405 runs, 3 seeds. Added: E2 (MAE on a 20,000-image pool), F (ImageNet ViT + continued MAE), A2 (ResNet-34), and a
+wider learning-rate grid for every arm.
+
+**Does it change the original claim? No, it strengthens it.** The ImageNet ViT (C) still wins every one of the 20
+(dataset, budget) cells among A, C, D, E, and now also against E2.
+
+| Hypothesis | Verdict | Evidence |
+|---|---|---|
+| H6 more unlabelled data helps MAE (E2 > E) | **not supported** | E2 - E averaged over budgets: CIFAR-10 -0.007, EuroSAT +0.007, PlantVillage +0.006, all intervals include 0; E2 > E in 8 of 15 cells |
+| H7 E2 overtakes C | **not supported** | E2 is below C in all 15 cells (14 significantly); best gap -0.014 (PlantVillage 100 %) |
+| H8 ImageNet + MAE (F) beats C | **not supported** | F > C in 3 of 20 cells, none significant, 10 cells significantly below; F ties C at high budgets on EuroSAT and PlantVillage (gap +0.003, +0.006) and is far below at low budgets, CIFAR-10 and Pets (CIFAR-10 5 %: 0.515 vs 0.865) |
+| H9 F >= E2 | supported | F - E2: +0.158 CIFAR-10, +0.090 EuroSAT, +0.082 PlantVillage (mostly the ImageNet start) |
+| H10 ResNet-34 ~ ResNet-18 | partly supported | within 0.03 in 18 of 20 cells; largest A2 - A: +0.042 (CIFAR-10 100 %) |
+| H11 wider lr grid keeps C the winner | supported | C wins 20 of 20 |
+
+- The wider grid changed the chosen learning rate in 9 of 16 old cells (re-run). E - C gaps barely moved
+  (PlantVillage 100 %: -0.012 now, -0.020 before). In 9 cells the choice still sits on an edge of the new grid.
+- Four times more unlabelled data bought almost nothing for MAE here, so the v1 result was not caused by the small pool.
+- Continued MAE hurt the ImageNet features instead of improving them. F's MAE learning rate (5e-5) was not tuned, so
+  this is a result for that setting, not for all possible settings.
+- Calibration: mean raw ECE C 0.052 < E2 0.116 < D 0.121 < F 0.146 < E 0.151 < A 0.179; after temperature scaling all
+  arms are within 0.024-0.033.
