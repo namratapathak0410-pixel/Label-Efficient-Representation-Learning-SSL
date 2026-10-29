@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.002__eurosat__E_vit_mae__b20__s0",
+  "tag": "tune-lr0.002",
+  "dataset": "eurosat",
+  "arm": "E_vit_mae",
+  "family": "vit",
+  "init": "mae",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.002,
+  "n_labeled": 999,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 63.985791999992216,
+  "peak_gpu_mem_gb": 1.87397632,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.826828851940516,
+  "weights": "D:\\SSL\\mae-crossover\\checkpoints\\crossover_v1\\eurosat\\mae_seed0\\encoder.pt"
+}

@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.00025__pets__C_vit_imagenet__b20__s0",
+  "tag": "tune-lr0.00025",
+  "dataset": "pets",
+  "arm": "C_vit_imagenet",
+  "family": "vit",
+  "init": "imagenet",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.00025,
+  "n_labeled": 995,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 512,
+  "stopped_early": true,
+  "train_seconds": 47.965581499998734,
+  "peak_gpu_mem_gb": 1.874835968,
+  "n_params": 5513125,
+  "best_val_macro_f1": 0.843789755903177,
+  "weights": "deit_tiny_patch16_224 (timm, ImageNet-1k)"
+}

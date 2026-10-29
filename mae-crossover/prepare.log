@@ -1,0 +1,28 @@
+﻿.venv\Scripts\python.exe : 16:22:50 | ===== prepare (crossover_v1) =====
+At line:1 char:327
++ ... L\mae-crossover; .venv\Scripts\python.exe run.py prepare 2>&1 | Tee-O ...
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (16:22:50 | ====...sover_v1) =====:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+16:22:53 | [plantvillage] cache exists: D:\SSL\mae-crossover\data\cache\160px\plantvillage.npz
+16:22:53 | [cifar10] cache exists: D:\SSL\mae-crossover\data\cache\160px\cifar10.npz
+16:22:53 | [eurosat] cache exists: D:\SSL\mae-crossover\data\cache\160px\eurosat.npz
+16:22:53 | [pets] cache exists: D:\SSL\mae-crossover\data\cache\160px\pets.npz
+16:22:53 | [imagenetv2] listing / downloading ...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+16:27:34 | [imagenetv2] 10000 images, 1000 classes available
+
+decode imagenetv2:   0%|          | 0/10000 [00:00<?, ?it/s]
+decode imagenetv2:  16%|█▌        | 1588/10000 [00:05<00:26, 317.54it/s]
+decode imagenetv2:  32%|███▏      | 3176/10000 [00:10<00:22, 304.47it/s]
+decode imagenetv2:  47%|████▋     | 4701/10000 [00:15<00:17, 299.29it/s]
+decode imagenetv2:  62%|██████▏   | 6199/10000 [00:20<00:13, 291.26it/s]
+decode imagenetv2:  77%|███████▋  | 7657/10000 [00:26<00:08, 273.29it/s]
+decode imagenetv2:  90%|█████████ | 9031/10000 [00:32<00:03, 261.81it/s]
+decode imagenetv2: 100%|██████████| 10000/10000 [00:36<00:00, 271.15it/s]
+16:28:12 | [imagenetv2] cached 10000 images (1000 classes, 0 unreadable) -> 
+D:\SSL\mae-crossover\data\cache\160px\imagenetv2.npz
+16:28:12 | Datasets used: {'plant': 'plantvillage', 'objects': 'cifar10', 'satellite': 'eurosat', 'animals': 'pets'}
+16:28:12 | done in 5.4 min

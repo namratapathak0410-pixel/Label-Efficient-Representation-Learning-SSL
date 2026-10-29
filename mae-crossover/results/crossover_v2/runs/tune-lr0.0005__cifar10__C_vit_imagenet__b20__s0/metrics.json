@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.0005__cifar10__C_vit_imagenet__b20__s0",
+  "tag": "tune-lr0.0005",
+  "dataset": "cifar10",
+  "arm": "C_vit_imagenet",
+  "family": "vit",
+  "init": "imagenet",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.0005,
+  "n_labeled": 1000,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 480,
+  "stopped_early": true,
+  "train_seconds": 42.99549519999982,
+  "peak_gpu_mem_gb": 1.874762752,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.9135241118060703,
+  "weights": "deit_tiny_patch16_224 (timm, ImageNet-1k)"
+}

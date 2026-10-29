@@ -1,0 +1,24 @@
+﻿.venv\Scripts\python.exe : 16:45:52 | ===== distance (crossover_v1) =====
+At line:1 char:327
++ ... \mae-crossover; .venv\Scripts\python.exe run.py distance 2>&1 | Tee-O ...
++                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (16:45:52 | ====...sover_v1) =====:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits 
+and faster downloads.
+16:46:04 | [distance] {'domain': 'plant', 'dataset': 'plantvillage', 'fid': 433.3278473298882, 'otdd': 
+30.621307942668608, 'imagenet_confidence': 0.2979103624820709, 'linear_probe_acc': 0.899, 'n_train': 4999, 
+'n_classes': 38}
+D:\SSL\mae-crossover\mc\distance.py:50: LinAlgWarning: Matrix is singular. The result might be inaccurate or the array 
+might not have a square root.
+  covmean, _ = linalg.sqrtm(s1 @ s2, disp=False)
+16:46:08 | [distance] {'domain': 'objects', 'dataset': 'cifar10', 'fid': 266.53150710704006, 'otdd': 
+28.25110199294034, 'imagenet_confidence': 0.2939121127128601, 'linear_probe_acc': 0.833, 'n_train': 5000, 'n_classes': 
+10}
+16:46:12 | [distance] {'domain': 'satellite', 'dataset': 'eurosat', 'fid': 318.0898891713022, 'otdd': 
+26.42337450914934, 'imagenet_confidence': 0.13917551934719086, 'linear_probe_acc': 0.858, 'n_train': 5000, 
+'n_classes': 10}
+16:46:16 | [distance] {'domain': 'animals', 'dataset': 'pets', 'fid': 272.93170972783065, 'otdd': 29.30069841888175, 
+'imagenet_confidence': 0.5100551843643188, 'linear_probe_acc': 0.861, 'n_train': 5000, 'n_classes': 37}
+16:46:16 | done in 0.4 min

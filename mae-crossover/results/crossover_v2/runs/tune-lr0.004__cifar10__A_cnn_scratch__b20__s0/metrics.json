@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.004__cifar10__A_cnn_scratch__b20__s0",
+  "tag": "tune-lr0.004",
+  "dataset": "cifar10",
+  "arm": "A_cnn_scratch",
+  "family": "cnn",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.004,
+  "n_labeled": 1000,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 75.20089629999711,
+  "peak_gpu_mem_gb": 2.55787776,
+  "n_params": 11181642,
+  "best_val_macro_f1": 0.5509742560602386
+}

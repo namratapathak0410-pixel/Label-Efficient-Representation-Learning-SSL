@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.00025__eurosat__D_vit_scratch__b20__s0",
+  "tag": "tune-lr0.00025",
+  "dataset": "eurosat",
+  "arm": "D_vit_scratch",
+  "family": "vit",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.00025,
+  "n_labeled": 999,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 63.880722699992475,
+  "peak_gpu_mem_gb": 1.87397632,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.8297916281263913
+}

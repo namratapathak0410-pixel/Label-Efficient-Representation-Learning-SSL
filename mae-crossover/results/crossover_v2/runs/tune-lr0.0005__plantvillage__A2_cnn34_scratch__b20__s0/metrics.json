@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.0005__plantvillage__A2_cnn34_scratch__b20__s0",
+  "tag": "tune-lr0.0005",
+  "dataset": "plantvillage",
+  "arm": "A2_cnn34_scratch",
+  "family": "cnn",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.0005,
+  "n_labeled": 998,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 133.18799809999473,
+  "peak_gpu_mem_gb": 2.760492544,
+  "n_params": 21304166,
+  "best_val_macro_f1": 0.8097431384460173
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.00025__eurosat__A_cnn_scratch__b20__s0",
+  "tag": "tune-lr0.00025",
+  "dataset": "eurosat",
+  "arm": "A_cnn_scratch",
+  "family": "cnn",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.00025,
+  "n_labeled": 999,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 71.81340539999655,
+  "peak_gpu_mem_gb": 2.554134016,
+  "n_params": 11181642,
+  "best_val_macro_f1": 0.8093410325536728
+}

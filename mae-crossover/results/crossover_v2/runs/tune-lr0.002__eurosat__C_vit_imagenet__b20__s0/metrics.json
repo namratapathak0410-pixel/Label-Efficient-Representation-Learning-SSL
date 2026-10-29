@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.002__eurosat__C_vit_imagenet__b20__s0",
+  "tag": "tune-lr0.002",
+  "dataset": "eurosat",
+  "arm": "C_vit_imagenet",
+  "family": "vit",
+  "init": "imagenet",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.002,
+  "n_labeled": 999,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 576,
+  "stopped_early": true,
+  "train_seconds": 46.1606133000023,
+  "peak_gpu_mem_gb": 1.873845248,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.9602894338731476,
+  "weights": "deit_tiny_patch16_224 (timm, ImageNet-1k)"
+}

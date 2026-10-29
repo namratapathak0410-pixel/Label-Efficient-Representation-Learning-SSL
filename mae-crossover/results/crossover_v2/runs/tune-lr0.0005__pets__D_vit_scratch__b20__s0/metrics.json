@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.0005__pets__D_vit_scratch__b20__s0",
+  "tag": "tune-lr0.0005",
+  "dataset": "pets",
+  "arm": "D_vit_scratch",
+  "family": "vit",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.0005,
+  "n_labeled": 995,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 768,
+  "stopped_early": true,
+  "train_seconds": 72.14889220000077,
+  "peak_gpu_mem_gb": 1.87422976,
+  "n_params": 5513125,
+  "best_val_macro_f1": 0.13155181526361898
+}

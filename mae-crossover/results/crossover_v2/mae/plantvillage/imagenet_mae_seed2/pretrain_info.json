@@ -1,0 +1,19 @@
+{
+  "dataset": "plantvillage",
+  "variant": "imagenet_mae",
+  "seed": 2,
+  "steps": 15200,
+  "epochs": 194.87179487179486,
+  "n_unlabelled": 20000,
+  "batch_size": 256,
+  "base_lr": 5e-05,
+  "mask_ratio": 0.75,
+  "decoder_depth": 2,
+  "decoder_dim": 128,
+  "pretrain_seconds": 1175.4057466000086,
+  "images_per_second": 3310.516399341868,
+  "final_loss": 0.4576839506626129,
+  "uses_labels": false,
+  "uses_val_or_test": false,
+  "peak_gpu_mem_gb": 3.566350848
+}

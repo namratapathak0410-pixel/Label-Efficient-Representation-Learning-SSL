@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.001__pets__F_vit_imagenet_mae__b20__s0",
+  "tag": "tune-lr0.001",
+  "dataset": "pets",
+  "arm": "F_vit_imagenet_mae",
+  "family": "vit",
+  "init": "imagenet_mae",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.001,
+  "n_labeled": 995,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 64.07135130000825,
+  "peak_gpu_mem_gb": 1.874098688,
+  "n_params": 5513125,
+  "best_val_macro_f1": 0.5421512118846608,
+  "weights": "D:\\SSL\\mae-crossover\\checkpoints\\crossover_v2\\pets\\imagenet_mae_seed0\\encoder.pt"
+}

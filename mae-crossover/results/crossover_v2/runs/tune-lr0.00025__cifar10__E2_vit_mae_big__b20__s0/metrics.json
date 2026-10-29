@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.00025__cifar10__E2_vit_mae_big__b20__s0",
+  "tag": "tune-lr0.00025",
+  "dataset": "cifar10",
+  "arm": "E2_vit_mae_big",
+  "family": "vit",
+  "init": "mae_big",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.00025,
+  "n_labeled": 1000,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 64.0142160999967,
+  "peak_gpu_mem_gb": 1.873189888,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.5717307956484687,
+  "weights": "D:\\SSL\\mae-crossover\\checkpoints\\crossover_v2\\cifar10\\mae_big_seed0\\encoder.pt"
+}

@@ -1,7 +1,7 @@
 .venv/
 data/
 checkpoints/
-results/*/runs/
+# per-run folders are pushed (61 MB): metrics, histories, logits
 results/smoke/
 __pycache__/
 *.pyc

@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.001__pets__E_vit_mae__b20__s0",
+  "tag": "tune-lr0.001",
+  "dataset": "pets",
+  "arm": "E_vit_mae",
+  "family": "vit",
+  "init": "mae",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.001,
+  "n_labeled": 995,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 75.22775089999959,
+  "peak_gpu_mem_gb": 1.87422976,
+  "n_params": 5513125,
+  "best_val_macro_f1": 0.3016715629602263,
+  "weights": "D:\\SSL\\mae-crossover\\checkpoints\\crossover_v1\\pets\\mae_seed0\\encoder.pt"
+}

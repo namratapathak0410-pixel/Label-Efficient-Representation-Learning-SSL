@@ -1,0 +1,20 @@
+{
+  "run_id": "tune-lr0.001__pets__A_cnn_scratch__b20__s0",
+  "tag": "tune-lr0.001",
+  "dataset": "pets",
+  "arm": "A_cnn_scratch",
+  "family": "cnn",
+  "init": "scratch",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.001,
+  "n_labeled": 995,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 83.57109619999937,
+  "peak_gpu_mem_gb": 2.55729408,
+  "n_params": 11195493,
+  "best_val_macro_f1": 0.2861224232038648
+}

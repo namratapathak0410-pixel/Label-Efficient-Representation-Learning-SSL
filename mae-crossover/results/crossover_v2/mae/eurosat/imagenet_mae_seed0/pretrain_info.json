@@ -1,0 +1,19 @@
+{
+  "dataset": "eurosat",
+  "variant": "imagenet_mae",
+  "seed": 0,
+  "steps": 15200,
+  "epochs": 194.87179487179486,
+  "n_unlabelled": 20000,
+  "batch_size": 256,
+  "base_lr": 5e-05,
+  "mask_ratio": 0.75,
+  "decoder_depth": 2,
+  "decoder_dim": 128,
+  "pretrain_seconds": 1360.5101797000098,
+  "images_per_second": 2860.103553843311,
+  "final_loss": 0.23860353231430054,
+  "uses_labels": false,
+  "uses_val_or_test": false,
+  "peak_gpu_mem_gb": 3.02933248
+}

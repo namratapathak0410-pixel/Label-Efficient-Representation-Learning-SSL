@@ -1,0 +1,21 @@
+{
+  "run_id": "tune-lr0.002__cifar10__F_vit_imagenet_mae__b20__s0",
+  "tag": "tune-lr0.002",
+  "dataset": "cifar10",
+  "arm": "F_vit_imagenet_mae",
+  "family": "vit",
+  "init": "imagenet_mae",
+  "budget_pct": 20,
+  "seed": 0,
+  "lr": 0.002,
+  "n_labeled": 1000,
+  "batch_size": 128,
+  "planned_steps": 800,
+  "steps_run": 800,
+  "stopped_early": false,
+  "train_seconds": 64.14791179999884,
+  "peak_gpu_mem_gb": 1.873189888,
+  "n_params": 5507914,
+  "best_val_macro_f1": 0.7535546583867141,
+  "weights": "D:\\SSL\\mae-crossover\\checkpoints\\crossover_v2\\cifar10\\imagenet_mae_seed0\\encoder.pt"
+}
