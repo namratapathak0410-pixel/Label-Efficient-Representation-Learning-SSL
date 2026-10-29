@@ -1,0 +1,17 @@
+dataset,arm,lr_v1,lr_v2,changed
+plantvillage,A_cnn_scratch,0.002,0.004,True
+plantvillage,C_vit_imagenet,0.001,0.002,True
+plantvillage,D_vit_scratch,0.002,0.002,False
+plantvillage,E_vit_mae,0.001,0.002,True
+cifar10,A_cnn_scratch,0.002,0.002,False
+cifar10,C_vit_imagenet,0.00025,0.000125,True
+cifar10,D_vit_scratch,0.0005,0.00025,True
+cifar10,E_vit_mae,0.0005,0.0005,False
+eurosat,A_cnn_scratch,0.001,0.004,True
+eurosat,C_vit_imagenet,0.001,0.002,True
+eurosat,D_vit_scratch,0.0005,0.0005,False
+eurosat,E_vit_mae,0.0005,0.0005,False
+pets,A_cnn_scratch,0.002,0.002,False
+pets,C_vit_imagenet,0.0005,0.0005,False
+pets,D_vit_scratch,0.001,0.00025,True
+pets,E_vit_mae,0.001,0.002,True

@@ -1,0 +1,12 @@
+{
+  "n_runs": 405,
+  "arms": [
+    "A_cnn_scratch",
+    "A2_cnn34_scratch",
+    "C_vit_imagenet",
+    "D_vit_scratch",
+    "E_vit_mae",
+    "E2_vit_mae_big",
+    "F_vit_imagenet_mae"
+  ]
+}

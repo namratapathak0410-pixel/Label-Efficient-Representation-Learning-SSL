@@ -1,0 +1,7 @@
+id,hypothesis,result,verdict
+H6,"E2 > E (budget- and seed-averaged) in each of PlantVillage, CIFAR-10, EuroSAT","cifar10 -0.007 [-0.026, +0.011]; eurosat +0.007 [-0.007, +0.022]; plantvillage +0.006 [-0.018, +0.031]; E2>E in 8/15 cells",not supported
+H7,E2-C > E-C at every budget; E2 overtakes C (CI excludes 0) somewhere,"E2-C > E-C in 8/15 cells; cells with E2 significantly above C: none; best E2-C gap -0.014 (plantvillage, 100%)",not supported
+H8,F > C in more than half of the 20 cells; gain larger in farther domains,"F>C in 3/20 cells (0 with CI above 0, 10 with CI below 0); Spearman of mean F-C gap with distance: fid +0.60 (p=0.42), otdd -0.40 (p=0.75), imagenet_confidence -0.80 (p=0.33), linear_probe_acc +0.00 (p=1.00)",not supported
+H9,F >= E2 (budget- and seed-averaged) in the three pooled datasets,"cifar10 +0.158 [+0.083, +0.233]; eurosat +0.090 [+0.077, +0.103]; plantvillage +0.082 [+0.076, +0.089]",supported
+H10,A2-A within +-0.03 in most cells; MAE-vs-ResNet verdict unchanged,"|A2-A| < 0.03 in 18/20 cells (range -0.015 to +0.042); best MAE arm beats ResNet-18 in 14/20 cells, ResNet-34 in 13/20; verdict flips in 1 cells",partly supported
+H11,"Wider lr grid does not change the winner among A, C, D, E (v1: C won 20/20)",C wins 20/20 cells,supported
