@@ -3,7 +3,7 @@
 | File | What |
 |---|---|
 | `main.tex` | The paper (IEEEtran conference class) |
-| `main.pdf` | Compiled paper (8 pages): Study 1 and Study 2 (experiment 2) |
+| `main.pdf` | Compiled paper (7 pages): Study 1 and Study 2 (experiment 2) |
 | `refs.bib` | Bibliography (36 entries); every entry checked against arXiv or the publisher |
 | `make_figures.py` | Builds every figure in `figures/` and every data table in `tables/` from `results/crossover_v1/` and the MAE checkpoints, so no result number is typed by hand |
 | `figures/*.pdf` | Generated figures |

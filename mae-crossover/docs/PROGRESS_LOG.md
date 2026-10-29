@@ -84,6 +84,8 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | ~11:30 | Pushed everything except datasets (11 GB) and MAE encoder checkpoints (802 MB): per-run folders (61 MB), MAE reconstructions / loss curves / info for all 33 pretrainings (`results/*/mae/`), `logs/experiment.log`, `prepare.log`, `distance.log` | `28a541d` |
 | ~12:30 | Paper updated with Study 2 and rewritten throughout in plainer, original wording. New: Study 2 section, figure (gaps to C for E, E2, F), table, all 11 hypotheses in one table, 2 new verified references (Reed et al. 2022, Gururangan et al. 2020). To stay at 8 pages, the Study 1 distance scatter, calibration plot and E-C gap plot were removed (their numbers are in tables/text) and the reconstruction figure shrunk to one image per domain. Compiles with no warnings, 8 pages | this commit |
 
+| ~13:30 | Paper cut from 8 to 7 pages at Soham's request: removed three Study 1 tables whose numbers are in the text (pairwise gaps, distance association, ranking agreement), shortened introduction, related work, method, discussion and limitations, and reworded the standard method descriptions again. No result was removed. Compiles with no warnings | this commit |
+
 ## Next
 1. Namrata / Soham read the PDF and send corrections
 2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.

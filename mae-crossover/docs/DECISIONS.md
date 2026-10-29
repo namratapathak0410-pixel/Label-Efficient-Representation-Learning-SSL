@@ -48,3 +48,4 @@ If a decision changes later, the old row stays and a new row is added (so the hi
 | 41 | 10-29 | Push per-run results, MAE pictures and logs; keep datasets and encoder checkpoints local | Soham ("push everything"), Claude for the exclusions | Data are public and rebuilt by `prepare`; checkpoints are 802 MB |
 | 42 | 10-29 | Paper presents experiment 2 as "Study 2" next to Study 1; Study 1 numbers stay those of the original pre-registered run | Claude | Keeps the first pre-registration intact; Study 2 reports the re-tuned numbers separately |
 | 43 | 10-29 | Paper text rewritten in plainer, original wording; 8 pages (was 7) | Soham asked for low plagiarism and human-sounding sentences | Study 2 needs about a page; three Study 1 figures dropped whose numbers already appear in tables |
+| 44 | 10-29 | Paper limited to 7 pages | Soham | Requested 5-7 pages; tables duplicating numbers in the text were removed first |

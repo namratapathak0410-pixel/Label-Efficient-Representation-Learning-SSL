@@ -51,67 +51,53 @@ domain distance, calibration, plant disease
 
 % =====================================================================================================
 \section{Introduction}
-Labels are the expensive part of most vision projects outside everyday photography. Anyone can photograph a
-tomato leaf, but deciding which of a dozen diseases it shows takes a plant pathologist. Satellite land-cover maps
-and medical scans have the same problem. So nobody trains from scratch; the usual first step is to load weights
-learned on ImageNet~\cite{deng2009imagenet}, a collection of 1.28 million labelled photographs of everyday objects.
+Outside everyday photography, labels are usually the costly part of a vision project. Anyone can photograph a
+tomato leaf, but naming its disease takes a plant pathologist, and satellite or medical images have the same
+problem. The usual remedy is to start from weights learned on ImageNet~\cite{deng2009imagenet}, 1.28 million
+labelled photographs of everyday objects.
 
-Self-supervised learning offers a second option. A masked autoencoder (MAE)~\cite{he2022mae} hides most of an
-image's patches and trains the network to paint them back in. It needs no labels, so it can be run on exactly the
-images one cares about. The choice is therefore between a lot of knowledge from the wrong visual world and a little
-knowledge from the right one. Several papers report that MAE pretraining on small target datasets helps
+Self-supervised learning offers another route. A masked autoencoder (MAE)~\cite{he2022mae} hides most of an image
+and learns to fill the gaps back in, so it needs no labels and can be trained on exactly the images one cares about.
+The trade-off is plenty of knowledge from the wrong visual world against a little from the right one. MAE on small
+target datasets has been reported to help
 ViTs~\cite{elnouby2021largescale,zhou2022selfpretrain,mao2022maedatahungry,das2024limited}, and in-domain
-contrastive pretraining has been found to compete with ImageNet in some settings~\cite{cole2022contrastive}. What
-we could not find is an answer to the practical question \emph{at what label budget} the in-domain route starts to
-pay off, and whether one can tell in advance from how different the domain looks from ImageNet. Ericsson
-et~al.~\cite{ericsson2021transfer} list exactly this link between domain distance and transfer as open.
+contrastive pretraining can rival ImageNet in some settings~\cite{cole2022contrastive}. We could not find an answer
+to the practical question of \emph{at what label budget} the in-domain route starts to pay off, or whether this can
+be read off from how unlike ImageNet a domain is, a link that Ericsson et~al.~\cite{ericsson2021transfer} leave open.
 
-We set out to answer it with a controlled, pre-registered design. Our contributions are:
-\begin{enumerate}
-\item A comparison of four starting points on four domains in which the three ViTs are architecturally identical
-and differ only in their initial weights, trained on the same nested label subsets with the same protocol.
-\item A crossover analysis over five label budgets. In-domain MAE never overtakes ImageNet, but the gap shrinks in
-every domain as labels are added.
-\item Four distances between each domain and ImageNet, measured before training. They disagree with one another
-and none of them predicts the gap.
-\item A follow-up study that removes three possible excuses for MAE (too little unlabelled data, a narrow
-learning-rate grid, a weak convolutional baseline) and tests a hybrid that continues MAE from ImageNet weights.
-None of these changes the conclusion.
-\item Evidence that rankings by accuracy replicate across domains, whereas rankings by calibration after
-temperature scaling do not.
-\end{enumerate}
-Both studies were written down and committed to a public repository before their first training run, and together
-they took about 36\,h on a laptop GPU.
+We address this with two pre-registered studies. Our contributions are: (1) a comparison of four starting points on
+four domains, in which the three ViTs share one architecture and differ only in their initial weights; (2) a
+crossover analysis over five label budgets, showing that in-domain MAE never overtakes ImageNet although the gap
+shrinks in every domain; (3) four domain distances measured before training, which disagree with each other and
+do not predict the gap; (4) a follow-up that removes three possible handicaps of MAE and tests a hybrid that
+continues MAE from ImageNet weights, none of which changes the conclusion; and (5) evidence that accuracy rankings
+replicate across domains while calibration rankings do not. Both studies were committed to a public repository
+before their first training run and took about 36\,h on a laptop GPU in total.
 
 % =====================================================================================================
 \section{Related Work}
-\textbf{Transfer from ImageNet.} Models that do better on ImageNet usually transfer
-better~\cite{kornblith2019transfer}, but Raghu et~al.~\cite{raghu2019transfusion} found that for medical images
-much of what ImageNet pretraining provides is not needed. ViTs~\cite{dosovitskiy2021vit} lack the built-in locality
-of convolutional networks~\cite{he2016resnet} and lean heavily on pretraining; DeiT~\cite{touvron2021deit} made it
-possible to train them on ImageNet-1k alone.
+\textbf{Transfer from ImageNet.} Stronger ImageNet models tend to transfer better~\cite{kornblith2019transfer},
+yet for medical images much of what ImageNet offers turns out to be unnecessary~\cite{raghu2019transfusion}. ViTs
+\cite{dosovitskiy2021vit} have no built-in locality, unlike CNNs~\cite{he2016resnet}, and depend heavily on
+pretraining; DeiT~\cite{touvron2021deit} showed they can be trained on ImageNet-1k alone.
 
-\textbf{Self-supervised and in-domain pretraining.} Ericsson et~al.~\cite{ericsson2021transfer} showed that how well
-self-supervised models transfer depends strongly on the target domain. Cole et~al.~\cite{cole2022contrastive} varied
-the size and the domain of the pretraining set for contrastive ResNet-50 models. MAE~\cite{he2022mae} hides 75\,\%
-of the patches and regresses their pixels. El-Nouby et~al.~\cite{elnouby2021largescale} and Zhou
-et~al.~\cite{zhou2022selfpretrain} reported that masked pretraining on the target data alone can be competitive,
-and Mao et~al.~\cite{mao2022maedatahungry} and Das et~al.~\cite{das2024limited} used MAE to make ViTs less data
-hungry. Hammoud et~al.~\cite{hammoud2024diversity} looked at the role of diversity in the pretraining data.
-Continuing to pretrain an existing model on in-domain data is a well-established idea in language
-modelling~\cite{gururangan2020dontstop}, and Reed et~al.~\cite{reed2022hpt} found that self-supervised pretraining
-started from ImageNet weights converges faster and transfers better than starting from scratch. On the plant side,
-deep networks are highly accurate on PlantVillage~\cite{hughes2015plantvillage,mohanty2016plant}, and
-self-supervised transformers have been trained on plant images~\cite{wang2024gpid}. We did not find a study that
-locates the label budget at which in-domain MAE overtakes ImageNet across several domains.
+\textbf{In-domain and continued pretraining.} The value of self-supervised features depends on the target
+domain~\cite{ericsson2021transfer}, and both the amount and the domain of pretraining data matter for contrastive
+models~\cite{cole2022contrastive}. Masked pretraining on the target data alone can be
+competitive~\cite{elnouby2021largescale,zhou2022selfpretrain} and reduces the data needs of
+ViTs~\cite{mao2022maedatahungry,das2024limited}; the diversity of the pretraining set also plays a
+part~\cite{hammoud2024diversity}. Continuing pretraining on in-domain data is common in language
+modelling~\cite{gururangan2020dontstop}, and Reed et~al.~\cite{reed2022hpt} report gains when self-supervised
+training starts from ImageNet weights. For plants, CNNs reach high accuracy on
+PlantVillage~\cite{hughes2015plantvillage,mohanty2016plant}, and self-supervised transformers have been trained on
+plant images~\cite{wang2024gpid}. None of these locates the label budget at which in-domain MAE overtakes ImageNet
+across several domains.
 
-\textbf{Dataset distance and calibration.} FID~\cite{heusel2017fid} compares two feature distributions, and
-OTDD~\cite{alvarezmelis2020otdd} also accounts for the labels. Guo et~al.~\cite{guo2017calibration} showed that
-modern networks are overconfident and proposed temperature scaling; Minderer et~al.~\cite{minderer2021calibration}
-revisited the question for newer architectures, and Sambyal et~al.~\cite{sambyal2023calibration} studied
-calibration with limited medical data. Dehghani et~al.~\cite{dehghani2021lottery} caution that conclusions drawn on
-one benchmark often fail to carry over, which is why we use several domains and rank
-statistics~\cite{demsar2006comparisons}.
+\textbf{Distances and calibration.} FID~\cite{heusel2017fid} compares feature distributions, and
+OTDD~\cite{alvarezmelis2020otdd} adds the labels. Temperature scaling~\cite{guo2017calibration} is the standard fix
+for overconfidence, and calibration has been revisited for newer models~\cite{minderer2021calibration} and for small
+medical datasets~\cite{sambyal2023calibration}. Since results on one benchmark often fail to carry
+over~\cite{dehghani2021lottery}, we use several domains and rank statistics~\cite{demsar2006comparisons}.
 
 % =====================================================================================================
 \section{Method}
@@ -153,34 +139,27 @@ the test set once.}
 \end{figure*}
 
 \subsection{Arms}
-Every arm is fine-tuned on the same labelled subsets (Fig.~\ref{fig:pipeline}). In Study~1 there are four.
-\textbf{A} is a ResNet-18~\cite{he2016resnet} trained from random weights (11.2\,M parameters). \textbf{C} is a
-ViT-Tiny with the DeiT-Tiny layout~\cite{touvron2021deit} (12 blocks, width 192, 3 heads, 5.5\,M parameters)
-loaded with supervised ImageNet-1k weights. \textbf{D} is the same ViT from random weights, and \textbf{E} is the
-same ViT whose weights come from an MAE trained on the domain's own training images, without their labels. Since
-C, D and E have one architecture, any difference between them comes from the starting weights. Our main contrast is
-E$-$C; E$-$D shows what MAE adds to a ViT, and E$-$A compares it with the inductive bias of a CNN.
-
-Study~2 adds three arms. \textbf{E2} is E with a four times larger unlabelled pool. \textbf{F} starts from C's
-ImageNet weights, continues MAE pretraining on the same pool, and is then fine-tuned like the others.
-\textbf{A2} replaces ResNet-18 by ResNet-34 (21.3\,M parameters). We kept ViT-Tiny, small ResNets and 160\,px
-inputs so that each study fits within 48\,h on one RTX~4050 Laptop GPU with 6\,GB of memory.
+All arms are fine-tuned on the same labelled subsets (Fig.~\ref{fig:pipeline}). Study~1 has four: \textbf{A}, a
+ResNet-18~\cite{he2016resnet} from random weights (11.2\,M parameters); \textbf{C}, a ViT-Tiny in the DeiT-Tiny
+layout~\cite{touvron2021deit} (12 blocks, width 192, 5.5\,M parameters) with supervised ImageNet-1k weights;
+\textbf{D}, the same ViT from random weights; and \textbf{E}, the same ViT initialised by an MAE trained on the
+domain's own training images without labels. As C, D and E share one architecture, their differences come only from
+the starting weights. E$-$C is the main contrast; E$-$D shows what MAE adds, and E$-$A compares it with a CNN.
+Study~2 adds \textbf{E2}, which is E with a four times larger unlabelled pool; \textbf{F}, which takes C's
+ImageNet weights, continues MAE on that pool and is then fine-tuned; and \textbf{A2}, a ResNet-34 (21.3\,M
+parameters). Model sizes and the 160\,px resolution were chosen so that each study fits within 48\,h on one
+RTX~4050 Laptop GPU (6\,GB).
 
 \subsection{Data, splits and label budgets}
-Each domain is represented by one dataset (Table~\ref{tab:data}): PlantVillage~\cite{hughes2015plantvillage}
-(plant disease, colour images), EuroSAT RGB~\cite{helber2019eurosat} (land cover from satellites),
-CIFAR-10~\cite{krizhevsky2009cifar} (objects) and Oxford-IIIT Pets~\cite{parkhi2012pets} (cat and dog breeds). We
-draw 7,000 images per dataset, stratified by class, so all domains start with the same amount of data. Images are
-resized so that the shorter side is 160\,px (bicubic) and centre-cropped; CIFAR-10 and EuroSAT are upsampled in the
-process.
-
-Datasets such as PlantVillage contain many near-copies, for example several shots of the same leaf. If such copies
-land on both sides of a split, test scores are inflated. We therefore hash every image (256-bit difference hash),
-link images whose hashes differ in at most 10 bits, and keep each linked group inside one split. The 70/15/15 split
-is made with \texttt{StratifiedGroupKFold} (seed 42). The label budgets are 5, 10, 20, 50 and 100\,\% of each
-class's training images, with at least one image per class, which corresponds to roughly 250 to 5,000 labelled
-images. Smaller subsets are contained in larger ones, and all arms see the same subset for a given seed. The seed
-(0, 1 or 2) also fixes the order of the data, the initialisation of any new layers and the MAE run used by E.
+Each domain is one dataset (Table~\ref{tab:data}): PlantVillage~\cite{hughes2015plantvillage} (leaf diseases),
+EuroSAT RGB~\cite{helber2019eurosat} (land cover), CIFAR-10~\cite{krizhevsky2009cifar} (objects) and Oxford-IIIT
+Pets~\cite{parkhi2012pets} (cat and dog breeds). We draw 7,000 images per dataset, stratified by class, resize the
+short side to 160\,px and crop the centre. Near-copies, such as repeated shots of one leaf, would inflate test
+scores if they straddled a split, so we hash each image (256-bit difference hash), group images whose hashes differ
+in at most 10 bits, and keep every group inside one split of a 70/15/15 \texttt{StratifiedGroupKFold} split. The
+label budgets are 5, 10, 20, 50 and 100\,\% of each class's training images (at least one per class), i.e.\ about
+250 to 5,000 labels. Smaller budgets are subsets of larger ones, and every arm sees the same subset for a given
+seed (0, 1 or 2), which also fixes data order, new-layer initialisation and E's MAE run.
 
 \begin{table*}[t]
 \centering
@@ -198,91 +177,71 @@ ImageNet conf.\ $\downarrow$ & Linear probe $\downarrow$ \\
 \end{tabular}
 \end{table*}
 
-\subsection{Distance between a domain and ImageNet}
-We pass every image through the frozen ImageNet DeiT-Tiny of arm C and keep its 192-d class token. ImageNetV2
-(matched frequency)~\cite{recht2019imagenetv2}, with 10,000 images over all 1,000 classes, stands in for ImageNet.
-On the training split we compute four numbers. (i) FID~\cite{heusel2017fid} between the two sets of features.
-(ii) OTDD~\cite{alvarezmelis2020otdd}, an optimal-transport distance in which the cost of matching two images also
-depends on how similar their classes are; we use a diagonal Gaussian per class, 64 PCA dimensions and 1,500 samples
-per side, solved with POT~\cite{flamary2021pot}. (iii) ImageNet confidence: the average top-class probability that
-the 1,000-way ImageNet classifier assigns to the domain's images (0.458 on ImageNetV2 itself). (iv) The validation
-accuracy of a logistic-regression probe trained on the frozen features. Large FID or OTDD, and small confidence or
-probe accuracy, mean the domain is far from ImageNet.
+\subsection{Distance from ImageNet}
+Images are embedded with C's frozen ImageNet ViT (192-d class token) and compared with ImageNetV2 (matched
+frequency, 10,000 images)~\cite{recht2019imagenetv2} as a stand-in for ImageNet. We measure (i)
+FID~\cite{heusel2017fid}; (ii) OTDD~\cite{alvarezmelis2020otdd}, whose matching cost also reflects class similarity
+(diagonal Gaussian per class, 64 PCA dimensions, 1,500 samples per side, POT solver~\cite{flamary2021pot}); (iii)
+ImageNet confidence, the mean top-class probability of the ImageNet classifier on the domain (0.458 on ImageNetV2
+itself); and (iv) the validation accuracy of a linear probe on the frozen features. Higher FID or OTDD and lower
+confidence or probe accuracy mean ``farther away''.
 
 \subsection{MAE pretraining}
-The MAE encoder is exactly the ViT-Tiny used by the other ViT arms, so its weights drop straight into E. Of the
-100 patches of an image, 75\,\% are hidden. A light decoder (2 blocks, width 128, 4 heads) predicts the
-per-patch normalised pixels of the hidden patches. We use batch 256, AdamW with $\beta=(0.9,0.95)$, a base
-learning rate of $1.5\times10^{-4}$, weight decay 0.05, a cosine schedule, random resized crops (scale 0.2--1) and
-horizontal flips. Encoder position embeddings start from fixed 2-D sine--cosine values. For E the pool is the
-$\sim$5,000 unlabelled training images, seen for 800 epochs (15,200 steps, 40 warm-up epochs). A separate MAE is
-trained for each seed, which takes about 21.5\,min.
+The MAE encoder is the same ViT-Tiny, so its weights load directly into the fine-tuned model. It hides 75\,\% of
+the 100 patches, and a small decoder (2 blocks, width 128) predicts the normalised pixels of the hidden ones. We use
+batch 256, AdamW ($\beta_2 = 0.95$), learning rate $1.5\times10^{-4}$, weight decay 0.05, cosine decay, random
+resized crops and flips, with sine--cosine position embeddings at the start. For E the pool is the $\sim$5,000
+training images, seen for 800 epochs (15,200 steps, $\sim$21.5\,min); each seed gets its own MAE.
+In Study~2 the pool holds 20,000 images: the training images plus 15,000 more drawn from \emph{outside} the
+7,000-image sample, so validation and test images cannot enter. Extras whose hash is within 10 bits of a validation
+or test image, or of a flipped copy, are dropped as well (227 on EuroSAT, none elsewhere). E2 keeps E's 15,200
+steps, so only the data changes. F uses the same schedule from the ImageNet weights, keeps their position
+embeddings and lowers the learning rate to $5\times10^{-5}$ to avoid erasing them; this value was fixed in advance,
+not tuned. Oxford Pets has no further images, so it has no E2 and its F uses the 5,000 training images.
 
-In Study~2 the pool grows to 20,000 images: the training images plus 15,000 extra images of the same dataset taken
-from \emph{outside} the 7,000-image sample, so no validation or test image can enter it. As a further safeguard, we
-drop any extra image whose hash lies within 10 bits of a validation or test image or of a flipped copy of one (227
-images on EuroSAT, none elsewhere). E2 is trained for the same 15,200 steps as E with 760 warm-up steps, so only the
-data changes, not the compute. F uses the same schedule but starts from the ImageNet weights, keeps their learned
-position embeddings and uses a smaller learning rate of $5\times10^{-5}$ so as not to wipe out what ImageNet
-taught. That value was fixed in advance and not tuned. Oxford Pets has no images beyond our sample, so there is no
-E2 for Pets, and its F uses the 5,000 training images.
+\subsection{Fine-tuning and statistics}
+All arms follow Table~\ref{tab:setup}. Validation macro-F1 is checked 25 times per run; training stops after 8
+checks without gain and the best weights are restored before the single test evaluation. Pretrained ViTs use
+layer-wise learning-rate decay of 0.75~\cite{bao2022beit}. The learning rate per dataset and arm is chosen on
+validation macro-F1 at the 20\,\% budget with seed 0 and reused everywhere. Study~2 widens the grid to five values
+and retunes every arm; old runs are reused where the chosen rate is unchanged and repeated where it changed.
 
-\subsection{Fine-tuning}
-All arms follow Table~\ref{tab:setup}. The number of steps grows with the number $n$ of labelled images. We check
-validation macro-F1 25 times per run, stop after 8 checks without improvement, restore the best checkpoint and only
-then evaluate on the test set. Pretrained ViTs use layer-wise learning-rate decay of 0.75~\cite{bao2022beit}, so
-that the early blocks move less than the late ones. The learning rate for each dataset and arm is picked on
-validation macro-F1 at the 20\,\% budget with seed 0 and then reused for every budget and seed. Study~2 widens the
-grid from three to five values (Table~\ref{tab:setup}) and retunes every arm. Where the choice for an old arm stays
-the same, the Study~1 runs are reused; where it changes, those runs are repeated.
+The main metric is test macro-F1; we also report the expected calibration error (ECE, 15
+bins~\cite{naeini2015ece}) before and after temperature scaling fitted on validation data~\cite{guo2017calibration}.
+Gaps between arms are paired by seed and given with 95\,\% $t$-intervals. The crossover budget is the sign change
+of the mean gap on a log-budget axis; without one it is reported as censored ($>$100\,\%), and it counts only if
+the intervals exclude zero on both sides. Each dataset's gap is summarised by its average over log-budget, which we
+relate to each distance by Spearman's $\rho$ with an exact permutation $p$ and a leave-one-dataset-out prediction.
+With four datasets no two-sided $p$ can fall below 0.083, so this analysis was declared exploratory. Ranking
+agreement across datasets uses Kendall's $W$~\cite{kendall1939rankings} and the Friedman test.
 
 \begin{table}[t]
 \centering
-\caption{Fine-tuning protocol, shared by all arms unless stated otherwise.}
+\caption{Fine-tuning protocol, shared by all arms.}
 \label{tab:setup}
 \footnotesize
 \begin{tabular}{@{}ll@{}}
 \toprule
 Optimiser & AdamW~\cite{loshchilov2019adamw}, weight decay 0.05 \\
 Batch / precision & 128 / bf16, gradient clipping 1.0 \\
-Schedule & 5\,\% linear warm-up, cosine decay \\
+Schedule & 5\,\% warm-up, cosine decay \\
 Steps & $\mathrm{clip}(100\lceil n/128\rceil, 600, 4000)$ \\
-Early stopping & 25 val.\ checks, patience 8, restore best \\
-Augmentation & random resized crop 0.35--1, flip, \\
- & brightness/contrast $\pm$20\,\% \\
-ViT details & drop-path 0.1, average-pooled tokens \\
-Layer-wise lr decay & 0.75 (pretrained ViTs: C, E, E2, F) \\
-LR grid, scratch & S1: $\{0.5, 1, 2\}\times10^{-3}$ \\
- & S2: $\{0.25, 0.5, 1, 2, 4\}\times10^{-3}$ \\
-LR grid, pretrained & S1: $\{0.25, 0.5, 1\}\times10^{-3}$ \\
- & S2: $\{0.125, 0.25, 0.5, 1, 2\}\times10^{-3}$ \\
+Augmentation & resized crop 0.35--1, flip, colour $\pm$20\,\% \\
+ViT details & drop-path 0.1, average pooling, LLRD 0.75 \\
+LR grid, scratch & S1: $\{0.5, 1, 2\}$, S2: $\{0.25, \ldots, 4\}\times10^{-3}$ \\
+LR grid, pretrained & S1: $\{0.25, 0.5, 1\}$, S2: $\{0.125, \ldots, 2\}\times10^{-3}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Metrics and statistics}
-Test macro-F1 is the primary metric. For calibration we report the expected calibration error (ECE, 15 equal-width
-bins~\cite{naeini2015ece,guo2017calibration}) before and after temperature scaling, with the temperature fitted on
-validation data. Gaps between two arms are paired by seed, because both see the same labelled subset, and are given
-with a 95\,\% $t$-interval over the three seeds. The crossover budget is where the mean gap changes sign, found by
-interpolating on a log-budget axis. If the sign never changes we report the crossover as censored ($>$100\,\% or
-$<$5\,\%), and we accept a crossover only if the intervals exclude zero on both sides of it. To summarise a dataset
-with one number we average the gap over the log-budget axis (trapezoidal rule). We relate this mean gap to each
-distance with Spearman's $\rho$, an exact permutation $p$-value and a leave-one-dataset-out linear prediction,
-compared against simply predicting the mean of the other datasets. Four datasets allow no two-sided $p$ smaller
-than $2/4! = 0.083$, so we declared this part exploratory from the start. Agreement of the arm rankings across
-datasets is measured per budget with Kendall's $W$~\cite{kendall1939rankings} and the Friedman test.
-
-\subsection{Pre-registration}
-Study~1's hypotheses (H1--H5), protocol and analysis plan were committed to the repository before the first
-training run. A single amendment, also made before training, raised MAE pretraining from 400 to 800 epochs once a
-speed test showed that the budget allowed it. Study~2's hypotheses (H6--H11) were committed after Study~1 had
-finished but before any Study~2 code was run. Table~\ref{tab:hyp} lists all eleven with their outcomes.
+\textbf{Pre-registration.} Hypotheses H1--H5, the protocol and the analysis plan of Study~1 were committed before
+its first run; one amendment, also before training, raised MAE from 400 to 800 epochs after a speed test.
+Hypotheses H6--H11 were committed after Study~1 ended and before any Study~2 code ran (Table~\ref{tab:hyp}).
 
 % =====================================================================================================
 \section{Study 1: Results}
-All 240 runs finished: 9.3\,h of fine-tuning, 1.0\,h of learning-rate selection and about 4.3\,h of MAE
-pretraining, 14.6\,h in total, never using more than 3.4\,GB of GPU memory.
+All 240 runs finished in 14.6\,h (9.3\,h fine-tuning, 1.0\,h learning-rate selection, 4.3\,h MAE), using at most
+3.4\,GB of GPU memory.
 
 \begin{figure*}[t]
 \centering
@@ -292,14 +251,12 @@ pretraining, 14.6\,h in total, never using more than 3.4\,GB of GPU memory.
 \label{fig:curves}
 \end{figure*}
 
-\subsection{ImageNet wins every cell and there is no crossover}
-Arm C had the best mean macro-F1 in all 20 dataset--budget cells (Fig.~\ref{fig:curves}, Table~\ref{tab:f1}). The
-paired gap E$-$C was negative in every cell, and its 95\,\% interval excluded zero every time (last column of Table~\ref{tab:f1}).
-The crossover budget is therefore censored at $>$100\,\% for all four datasets (Table~\ref{tab:pair}). H1 holds only
-in a weak form: the gap closes as labels are added, in every domain, but it does not flip. The closing is smooth.
-On PlantVillage the gap goes from $-0.239$ at 5\,\% to $-0.020$ at 100\,\% (95\,\% CI $[-0.037, -0.003]$), and on
-EuroSAT from $-0.183$ to $-0.049$. On CIFAR-10 ($-0.443$ to $-0.196$) and Oxford Pets ($-0.620$ to $-0.252$) a
-wide gap remains even with all labels.
+\textbf{No crossover.} C had the best mean macro-F1 in all 20 dataset--budget cells (Fig.~\ref{fig:curves},
+Table~\ref{tab:f1}). E$-$C was negative everywhere and its 95\,\% interval excluded zero in every cell, so the
+crossover is censored at $>$100\,\% for all datasets. H1 holds only in a weak form: the gap closes with more
+labels in every domain but never flips. On PlantVillage it shrank from $-0.239$ at 5\,\% to $-0.020$ at 100\,\%
+(CI $[-0.037, -0.003]$) and on EuroSAT from $-0.183$ to $-0.049$, while CIFAR-10 ($-0.443$ to $-0.196$) and Oxford
+Pets ($-0.620$ to $-0.252$) kept a wide gap.
 
 \begin{table}[t]
 \centering
@@ -317,97 +274,34 @@ E$-$C; $^{*}$95\,\% CI excludes 0.}
 \end{tabular}
 \end{table}
 
+\textbf{Distance does not predict the gap.} Averaged over budgets, the gap was much smaller for PlantVillage
+($-0.118$) and EuroSAT ($-0.110$) than for CIFAR-10 ($-0.317$) and Pets ($-0.489$), whose objects and animals
+ImageNet covers well; on Pets the ImageNet classifier is even more confident (0.51) than on ImageNetV2 (0.46). Yet
+the four distances disagree on which domain is far away (Table~\ref{tab:data}): FID puts PlantVillage farthest,
+confidence puts EuroSAT farthest and OTDD puts EuroSAT \emph{closest}. FID ($\rho = +0.6$) and confidence
+($\rho = -0.8$) point the way H2 expected, OTDD the other way ($\rho = -0.4$), and the linear probe not at all
+($\rho = 0$). No exact $p$ is below 0.33, and only confidence predicts a held-out dataset better than the mean
+(error 0.124 against 0.193). H2 is not supported.
 
-\begin{table}[t]
-\centering
-\caption{Study~1 gaps per dataset (macro-F1). Mean gap: E$-$C averaged over the log-budget axis. Ranges run over
-the five budgets; ``sig.'' counts budgets whose 95\,\% CI excludes 0.}
-\label{tab:pair}
-\scriptsize
-\setlength{\tabcolsep}{2.6pt}
-\begin{tabular}{@{}lccrcrc@{}}
-\toprule
- & \multicolumn{2}{c}{E$-$C} & \multicolumn{2}{c}{E$-$D} & \multicolumn{2}{c}{E$-$A} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Dataset & mean gap & crossover & range & sig. & range & sig. \\
-\midrule
-\tabinput{tables/pairwise.tex}
-\bottomrule
-\end{tabular}
-\end{table}
+\textbf{MAE versus scratch.} E beat the scratch ViT in all 20 cells, significantly in 13 (H3 mostly supported).
+The gain was largest on Pets ($+0.353$ at 100\,\%, 0.638 against 0.286) and CIFAR-10 ($+0.111$ to $+0.171$), and
+small and never significant on EuroSAT ($+0.007$ to $+0.037$), where the scratch ViT was already good. Against the
+scratch ResNet-18, E stayed between $-0.020$ and $+0.055$, significant in only 2 of 20 cells. At this scale MAE
+gives a ViT about what its convolutional design gives a ResNet.
 
-\subsection{Does distance from ImageNet predict the gap?}
-The mean gap was far smaller for PlantVillage ($-0.118$) and EuroSAT ($-0.110$) than for CIFAR-10 ($-0.317$) and
-Oxford Pets ($-0.489$). The last two are full of objects and animals that ImageNet covers well; Pets is in fact the
-only domain where the ImageNet classifier is more confident (0.51) than on ImageNetV2 (0.46). The trouble is that
-the four distances do not agree on which domain is far away (Table~\ref{tab:data}). FID puts PlantVillage farthest,
-ImageNet confidence puts EuroSAT farthest, and OTDD puts EuroSAT \emph{closest}. Their link to the gap is just as
-mixed (Table~\ref{tab:assoc}). FID ($\rho = +0.6$) and ImageNet confidence ($\rho = -0.8$)
-point the way H2 predicted, OTDD points the other way ($\rho = -0.4$) and the linear probe shows nothing. No
-$p$-value is below 0.33, and only ImageNet confidence predicts a held-out dataset better than the mean does
-(absolute error 0.124 against 0.193). With four domains, H2 is not supported.
-
-\begin{table}[t]
-\centering
-\caption{Distance versus mean gap E$-$C (exploratory, $n = 4$). ``Pred.'': sign of $\rho$ expected under H2.
-LOO: mean absolute error of a leave-one-dataset-out linear fit, against predicting the mean of the other datasets.}
-\label{tab:assoc}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lcrccc@{}}
-\toprule
-Distance & Pred. & $\rho$ & exact $p$ & LOO error & baseline \\
-\midrule
-\tabinput{tables/association.tex}
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{MAE against training from scratch}
-In-domain MAE beat the scratch ViT in all 20 cells, significantly in 13 (Table~\ref{tab:pair}), so H3 is mostly
-supported. The benefit was largest on Oxford Pets, where it reached $+0.353$ at 100\,\% (0.638 against 0.286), and
-it was also large on CIFAR-10 ($+0.111$ to $+0.171$). On EuroSAT it was small ($+0.007$ to $+0.037$) and never
-significant, because the scratch ViT was already good there (0.918 at 100\,\%). Compared with the scratch
-ResNet-18, MAE stayed between $-0.020$ and $+0.055$, with only 2 of 20 differences significant (CIFAR-10 at 5\,\%,
-Pets at 20\,\%). Put simply, at this scale MAE gives a ViT about what its convolutional design gives a ResNet, and
-not more.
-
-\subsection{Do the rankings replicate?}
-The order of the four arms by macro-F1 was nearly the same in every domain: C first, then E and A close together,
-then D. Kendall's $W$ lay between 0.90 and 1.00 at every budget (Friedman $p \leq 0.013$; Table~\ref{tab:rank}).
-H4, which expected the winner to change between domains, is rejected.
-
-Calibration told a different story. Before temperature scaling, C also had the lowest ECE
-in 17 of 20 cells (mean 0.052, against 0.119 for E, 0.154 for D and 0.171 for A). Temperature scaling brought every
-arm down to 0.024--0.032 on average, and after it the ranking no longer agreed across datasets ($W = 0.05$--$0.53$,
-all Friedman $p \geq 0.098$). The scratch ViT was even the best-calibrated arm in 7 cells. H5 is partly supported:
-calibration rankings part ways with accuracy rankings once a simple correction is applied.
-
-\begin{table}[t]
-\centering
-\caption{Study~1: agreement of arm rankings across the four datasets, per budget. Kendall's $W$ (1 = identical
-rankings) and Friedman $p$.}
-\label{tab:rank}
-\scriptsize
-\setlength{\tabcolsep}{3.2pt}
-\begin{tabular}{@{}lcccccc@{}}
-\toprule
- & \multicolumn{2}{c}{macro-F1} & \multicolumn{2}{c}{ECE} & \multicolumn{2}{c}{ECE after TS} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
-Budget \% & $W$ & $p$ & $W$ & $p$ & $W$ & $p$ \\
-\midrule
-\tabinput{tables/ranking.tex}
-\bottomrule
-\end{tabular}
-\end{table}
+\textbf{Rankings and calibration.} The order of the arms by macro-F1 (C, then E and A, then D) was nearly identical
+across domains: Kendall's $W$ was 0.90--1.00 at every budget (Friedman $p \leq 0.013$), so H4 is rejected.
+Before temperature scaling C also had the lowest ECE in 17 of 20 cells (mean 0.052, against 0.119 for E, 0.154 for D
+and 0.171 for A). Scaling brought every arm to 0.024--0.032 on average, after which the ranking no longer agreed
+across datasets ($W = 0.05$--$0.53$, all $p \geq 0.098$), and the scratch ViT was the best calibrated in 7 cells.
+H5 is partly supported.
 
 % =====================================================================================================
 \section{Study 2: Was Study 1 Unfair to MAE?}
-A negative result invites the question of whether the losing method was given a fair chance. Study~2 checks the
-three objections we found most convincing and adds the hybrid F. It produced 405 runs, of which the unchanged
-Study~1 cells were reused, and took about 21\,h; the laptop GPU ran at full load but throttled itself at
-$\sim$89\,$^{\circ}$C, so each MAE run took 22.8 instead of 21.5\,min. Table~\ref{tab:study2} and
-Fig.~\ref{fig:study2} summarise the outcome.
+A negative result raises the question of whether the losing method had a fair chance. Study~2 tests the three
+objections we found most convincing and adds the hybrid F. It used 405 runs, reusing unchanged Study~1 cells, and
+took about 21\,h; the GPU ran at full load but throttled at $\sim$89\,$^{\circ}$C, so an MAE run took 22.8 instead
+of 21.5\,min. Fig.~\ref{fig:study2} and Table~\ref{tab:study2} summarise the results.
 
 \begin{figure*}[t]
 \centering
@@ -437,36 +331,28 @@ Dataset & mean gap & mean gap & sig.\ $+$/$-$ & mean gap & mean gap & (of 5 budg
 \end{tabular}
 \end{table*}
 
-\subsection{A wider learning-rate grid}
-With five candidate rates instead of three, the chosen rate changed for 9 of the 16 Study~1 dataset--arm pairs,
-and those 135 runs were repeated. The picture did not move. C still won all 20 cells among the original four arms
-(H11 supported), and E$-$C stayed negative in all 20, significantly so in 19. The closest call is again
-PlantVillage at full labels, now $-0.012$ instead of $-0.020$.
+\textbf{Wider learning-rate grid.} With five candidate rates the choice changed for 9 of the 16 Study~1
+dataset--arm pairs, and those 135 runs were repeated. Nothing important moved: C still won all 20 cells among
+A, C, D and E (H11 supported), and E$-$C stayed negative everywhere, significantly in 19 cells. The closest case is
+again PlantVillage at full labels, now $-0.012$ instead of $-0.020$.
 
-\subsection{Four times more unlabelled images}
-If MAE simply had too little data, a bigger pool should have helped. It did not. Across the three datasets that
-had extra images, E2 and E differed by at most 0.02 macro-F1 in any cell, E2 was ahead in 8 of 15 cells, and none
-of the differences was significant (H6 not supported). E2 also stayed below C in all 15 cells, 14 of them
-significantly, and its best result was still 0.014 short (PlantVillage at 100\,\%; H7 not supported). Even the MAE
-reconstruction loss barely changed: after the same number of steps it ended at 0.407 rather than 0.409 on
-PlantVillage and 0.266 rather than 0.268 on CIFAR-10.
+\textbf{Four times more unlabelled images.} If MAE had simply been short of data, a larger pool should have helped.
+It did not: E2 and E differed by at most 0.02 in any cell, E2 led in 8 of 15 and no difference was significant
+(H6 not supported). E2 stayed below C in all 15 cells, 14 significantly, and came no closer than 0.014
+(PlantVillage, 100\,\%; H7 not supported). Even the reconstruction loss barely changed (0.407 against 0.409 on
+PlantVillage, 0.266 against 0.268 on CIFAR-10).
 
-\subsection{ImageNet first, then in-domain MAE}
-The hybrid F was meant to take the best of both. It did not. F beat C in only 3 of 20 cells, by at most 0.006 and
-never significantly, and it was significantly worse in 10 (H8 not supported). The damage is concentrated at small
-budgets. At 5\,\% labels F fell behind C by 0.351 on CIFAR-10 and by 0.542 on Pets, which is most of the advantage
-ImageNet had over in-domain MAE. With all labels F recovered to within 0.04 of C everywhere. As expected, F was well
-ahead of E2 (by 0.021 to 0.210, significant in 14 of 15 cells; H9 supported), but that edge comes from the ImageNet
-start, not from the extra MAE. F also behaved more like a model trained from scratch: it stopped early in 17\,\% of
-its runs, close to E (20\,\%) and far from C (67\,\%). Its correlation with the domain distances repeated the pattern
-of Study~1, with no $p$ below 0.33.
+\textbf{ImageNet first, then MAE.} The hybrid F beat C in only 3 of 20 cells, by at most 0.006 and never
+significantly, and was significantly worse in 10 (H8 not supported). The harm is concentrated at small budgets: at
+5\,\% F trailed C by 0.351 on CIFAR-10 and 0.542 on Pets, most of ImageNet's original lead over in-domain MAE. With
+all labels it came back to within 0.04 of C everywhere. F was well ahead of E2 (0.021 to 0.210, significant in 14
+of 15 cells; H9 supported), but that edge comes from the ImageNet start. F also stopped early in only 17\,\% of its
+runs, close to E (20\,\%) and far from C (67\,\%).
 
-\subsection{A larger ResNet}
-ResNet-34 and ResNet-18 were within 0.03 of each other in 18 of 20 cells. The only significant difference was on
-CIFAR-10 with all labels ($+0.042$). Swapping the CNN reversed the comparison with the best MAE arm in a single
-cell, so H10 is partly supported, and the claim that MAE roughly matches a scratch CNN at this scale stands.
-As for calibration, the mean ECE before temperature scaling was 0.052 for C, 0.116 for E2, 0.146 for F, 0.151 for E
-and 0.176 for ResNet-34; after scaling all arms fell between 0.024 and 0.033, as in Study~1.
+\textbf{A larger ResNet.} ResNet-34 and ResNet-18 were within 0.03 in 18 of 20 cells; the one significant
+difference was CIFAR-10 at 100\,\% ($+0.042$). The verdict of MAE against a scratch CNN changed in a single cell (H10
+partly supported). Mean ECE before scaling was 0.052 for C, 0.116 for E2, 0.146 for F, 0.151 for E and 0.176 for
+ResNet-34; after scaling all arms fell between 0.024 and 0.033, as in Study~1.
 
 \begin{table*}[t]
 \centering
@@ -489,7 +375,7 @@ H4 & The best arm differs across domains and budgets ($W < 1$) &
 H5 & Ranking by ECE differs from ranking by macro-F1 &
 \textbf{Partly}: similar before temperature scaling, different after \\
 \midrule
-H6 & A 20,000-image pool improves MAE (E2 $>$ E) on PlantVillage, CIFAR-10 and EuroSAT &
+H6 & A 20,000-image pool improves MAE (E2 $>$ E) &
 \textbf{Not supported}: differences within $\pm$0.02, 8/15 positive, none significant \\
 H7 & E2 narrows the gap to C at every budget and overtakes C somewhere &
 \textbf{Not supported}: E2 below C in 15/15 cells (14 significant) \\
@@ -505,44 +391,6 @@ H11 & The wider lr grid does not change the winner among A, C, D, E &
 \end{tabular}
 \end{table*}
 
-% =====================================================================================================
-\section{Discussion}
-\textbf{Why ImageNet keeps winning.} ImageNet-1k holds about 250 times more images than Study~1's in-domain pool and 64
-times more than Study~2's, and its labels push the network to pick up shapes, parts and textures. These generic features turn out to be useful
-even for leaves and satellite tiles. The ImageNet ViT also learned fastest during fine-tuning and triggered early
-stopping in two thirds of its runs. MAE, in contrast, learns by repainting pixels. Its reconstructions
-(Fig.~\ref{fig:recon}) get the overall layout right, such as the outline and colour of a leaf, but blur the small
-details, including the lesions that separate many PlantVillage classes. That would explain why the gap shrinks as
-labels are added: with enough labels, fine-tuning can learn the fine detail that the pretraining objective ignored.
-
-\textbf{Why more unlabelled data did not help.} With 20,000 instead of 5,000 images and the same number of steps,
-MAE reached the same reconstruction loss and the same downstream accuracy. At this model size and schedule, the
-bottleneck seems to be what pixel reconstruction teaches rather than how many images it sees. Data volumes in the
-MAE literature are often orders of magnitude larger~\cite{he2022mae}, so our result says ``four times more does not
-help'', not ``more can never help''.
-
-\textbf{Why continued MAE hurt.} Starting MAE from ImageNet weights moved the network away from the
-class-level features that made C strong, towards features that are good for repainting pixels. With few labels
-there is not enough signal to pull it back, which is why the damage is largest at 5--20\,\% and almost gone at
-100\,\%. Two caveats apply. Reed et~al.~\cite{reed2022hpt} saw benefits from such hierarchical pretraining, but they
-started from self-supervised weights and used contrastive objectives, not supervised weights and pixel
-reconstruction. And our MAE learning rate for F was a fixed guess: F's reconstruction loss stayed above that of the
-MAE trained from scratch (0.456 against 0.407 on PlantVillage), so a gentler or shorter schedule might behave
-differently. What we can say is that this obvious recipe is not a free improvement.
-
-\textbf{Where in-domain MAE comes closest.} The gap was smallest for the two domains that look least like ImageNet's
-object photographs (PlantVillage and EuroSAT) and largest where the content overlaps with ImageNet classes. That
-fits the intuition behind H2, yet none of the four distances captured it, so a single number seems too blunt to
-forecast a crossover. EuroSAT adds a warning: it had by far the lowest MAE reconstruction loss (0.19, against
-0.27--0.54 elsewhere) and the smallest gain over a scratch ViT. A low reconstruction loss is not, by itself, a sign
-of a useful representation.
-
-\textbf{What a practitioner can take from this.} With a few thousand to twenty thousand unlabelled images and a
-small ViT, start from ImageNet, at every label budget. In domains unlike ImageNet the remaining advantage at full
-labels can be small (about one macro-F1 point on PlantVillage), and in-domain MAE is still a clear step up from a
-ViT trained from scratch. Calibration should be checked for each domain, because the accuracy ranking does not
-carry over to it.
-
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{mae_reconstructions.pdf}
@@ -553,38 +401,62 @@ does not.}
 \end{figure}
 
 % =====================================================================================================
+\section{Discussion}
+\textbf{Why ImageNet keeps winning.} ImageNet-1k has about 250 times more images than Study~1's pool and 64 times
+more than Study~2's, and its labels force the network to learn shapes, parts and textures that prove useful even for
+leaves and satellite tiles. MAE learns by repainting pixels. Its reconstructions (Fig.~\ref{fig:recon}) recover the
+layout, such as a leaf's outline and colour, but blur fine detail, including the lesions that separate many
+PlantVillage classes. With enough labels, fine-tuning can learn that detail, which fits a gap that shrinks with
+the budget. That four times more images left both the reconstruction loss and the accuracy unchanged suggests the
+limit lies in what pixel reconstruction teaches at this model size rather than in how many images it sees. MAE is
+usually trained on far larger collections~\cite{he2022mae}, so our result means ``four times more does not help'',
+not ``more can never help''.
+
+\textbf{Why continued MAE hurt.} Continuing with MAE seems to pull the ImageNet network away from the class-level
+features that made C strong and towards features suited to repainting pixels. With few labels there is too little
+signal to pull it back, so the damage is largest at 5--20\,\% and almost gone at 100\,\%. Reed
+et~al.~\cite{reed2022hpt} saw the opposite, but they started from self-supervised weights and used contrastive
+objectives. Our learning rate for F was also a fixed guess, and F ended with a higher reconstruction loss than MAE
+from scratch (0.456 against 0.407 on PlantVillage), so a gentler or shorter schedule may behave differently. This
+simple recipe, at least, is not a free improvement.
+
+\textbf{Where in-domain MAE comes closest.} The gap was smallest for PlantVillage and EuroSAT, the domains least
+like ImageNet's object photos, as H2 intended, but no distance captured it; one number seems too blunt to forecast a
+crossover. EuroSAT also had by far the lowest reconstruction loss (0.19, against 0.27--0.54 elsewhere) and the
+smallest gain over a scratch ViT, so a low reconstruction loss is no sign of a useful representation.
+
+\textbf{Practical advice.} With up to twenty thousand unlabelled images and a small ViT, start from ImageNet at
+every label budget. In domains unlike ImageNet its lead at full labels can be small (about one point on
+PlantVillage), and in-domain MAE is still a clear step up from training a ViT from scratch. Calibration should be
+checked per domain, since the accuracy ranking does not carry over to it.
+
+% =====================================================================================================
 \section{Limitations}
-The studies were sized for one laptop GPU, and that sets their limits. (i) We used ViT-Tiny at 160\,px and at most
-20,000 unlabelled images per domain. Bigger models, higher resolution and much bigger pools favour MAE in the
-literature~\cite{he2022mae}, so a crossover may exist beyond our range. (ii) With four domains no rank correlation
-can reach $p < 0.083$, so H2 was only explored. (iii) Three seeds leave wide intervals for small effects.
-(iv) Even on the wider grid, 16 of the 27 chosen learning rates sit at one of its two ends, so some arms might still
-gain from further tuning; since the conclusions hardly moved when the grid was widened, we do not expect this to
-reverse them. (v) MAE used one recipe without a search over the masking ratio or the schedule, and F's MAE learning
-rate was not tuned. (vi) The DeiT weights were trained at 224\,px and their position embeddings were interpolated to
-160\,px; CIFAR-10 and EuroSAT were upsampled from 32 and 64\,px. (vii) Hashing cannot find every near-duplicate, for
-example the same leaf photographed from another angle. (viii) ImageNetV2 replaces ImageNet in the distance
-measures, Oxford Pets had no extra images for E2, and C benefits from far more pretraining compute than any MAE arm;
-we did not equalise compute between arms.
+The studies were sized for a laptop GPU. (i) ViT-Tiny, 160\,px and at most 20,000 unlabelled images per domain;
+larger models, resolutions and pools favour MAE~\cite{he2022mae}, so a crossover may exist beyond our range. (ii)
+Four domains cap any rank correlation at $p \geq 0.083$, and three seeds leave wide intervals for small effects.
+(iii) Even on the wider grid, 16 of 27 chosen learning rates lie at an end of the grid; since widening it barely
+changed the results, we do not expect further tuning to reverse them. (iv) One MAE recipe was used, and F's MAE
+learning rate was not tuned. (v) DeiT weights were trained at 224\,px and interpolated to 160\,px, and CIFAR-10 and
+EuroSAT were upsampled. (vi) Hashing cannot catch every near-duplicate, such as a leaf photographed from another
+angle. (vii) ImageNetV2 replaces ImageNet in the distances, Pets had no extra images for E2, and compute was not
+equalised between arms.
 
 % =====================================================================================================
 \section{Conclusion}
-We asked when in-domain MAE pretraining overtakes ImageNet initialisation for a small ViT as more labels become
-available. Over four domains and two pre-registered studies, the answer is that it does not, anywhere between 5 and
-100\,\% of the labels. ImageNet initialisation won all 20 settings. Its lead shrank as labels were added and was
-smallest for plant-disease and satellite images, but none of four standard distances predicted where it would be
-small. Giving MAE four times more unlabelled data, widening the learning-rate grid and using a deeper ResNet as the
-baseline did not change this, and continuing MAE from ImageNet weights made things worse when labels were scarce.
-In-domain MAE did reliably improve a ViT trained from scratch and matched a CNN trained from scratch. The natural
-next steps are much larger unlabelled pools, larger ViTs and more domains, which would also make it possible to
-test the link between domain distance and the crossover budget with real statistical power.
+Over four domains and two pre-registered studies, in-domain MAE did not overtake ImageNet initialisation of a small
+ViT anywhere between 5 and 100\,\% of the labels. ImageNet's lead shrank as labels were added and was smallest for
+plant-disease and satellite images, but no standard distance predicted where it would be small. Four times more
+unlabelled data, a wider learning-rate grid and a deeper ResNet baseline did not change this, and continuing MAE
+from ImageNet weights hurt when labels were scarce. In-domain MAE did reliably improve a ViT trained from scratch
+and matched a CNN trained from scratch. Much larger unlabelled pools, larger ViTs and more domains are the natural
+next steps, and would also allow the link between domain distance and the crossover to be tested properly.
 
 \section*{Reproducibility}
-Code, configurations, both pre-registrations, split files, every run's metrics and the experiment logs are
-available at\\
+Code, configurations, both pre-registrations, split files, every run's metrics and the logs are available at\\
 {\footnotesize\url{https://github.com/namratapathak0410-pixel/Label-Efficient-Representation-Learning-SSL}}.\\
-Models were built with PyTorch and timm~\cite{wightman2019timm}. Every figure and table in this paper is produced
-from the result files by \texttt{paper/make\_figures.py}.
+Models were built with PyTorch and timm~\cite{wightman2019timm}; every figure and table is produced from the result
+files by \texttt{paper/make\_figures.py}.
 
 % balance the two columns of the last page
 \IEEEtriggeratref{23}
