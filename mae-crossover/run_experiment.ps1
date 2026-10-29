@@ -1,4 +1,4 @@
-# Runs the main experiment end to end in its own window, independent of any editor or Claude session.
+# Runs the main experiment end to end in its own window, independent of any editor or terminal session.
 # Safe to re-run at any time: finished MAE encoders, lr choices and runs are skipped (resumes where it stopped).
 # Usage (from mae-crossover):  powershell -ExecutionPolicy Bypass -File run_experiment.ps1
 $ErrorActionPreference = "Continue"
@@ -31,7 +31,7 @@ Stage "analyze"
 # publish the results (per-run folders and checkpoints stay local, see .gitignore)
 Set-Location ..
 git add mae-crossover/results
-git commit -m "Main experiment results (auto-commit by run_experiment.ps1)`n`nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+git commit -m "Main experiment results (auto-commit by run_experiment.ps1)"
 git push origin main
 Set-Location $PSScriptRoot
 Say "===== $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ALL DONE, results pushed ====="

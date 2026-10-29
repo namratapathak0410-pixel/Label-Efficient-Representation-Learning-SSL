@@ -28,7 +28,7 @@ Stage "analyze2"
 
 Set-Location ..
 git add mae-crossover/results
-git commit -m "Experiment 2 results (auto-commit by run_experiment_v2.ps1)`n`nCo-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>"
+git commit -m "Experiment 2 results (auto-commit by run_experiment_v2.ps1)"
 git push origin main
 Set-Location $PSScriptRoot
 Say "===== $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ALL DONE (experiment 2), results pushed ====="

@@ -48,7 +48,7 @@ original releases directly (no account, verified checksums). The Kaggle copies a
 | 10-27 16:09 | CIFAR-10 | OK (server slow, ~1 h) |
 | 10-27 16:10 | EuroSAT | OK |
 | 10-27 16:17 | Oxford Pets | OK, 0 unreadable images |
-| 10-27 16:17 | ImageNetV2 | interrupted (Claude session ended), restarted ~16:40 |
+| 10-27 16:17 | ImageNetV2 | interrupted (terminal session ended), restarted ~16:40 |
 | 10-28 11:09 | Tectonic 0.15 (LaTeX engine, session temp folder) | Downloaded, but fails on Windows while setting up its LaTeX format (`expl3` error), so not used |
 | 10-28 ~11:40 | TinyTeX v2026.03 (TeX Live 2025), zip release, installed by Soham into `%APPDATA%\TinyTeX` | OK. The default `.exe` release was blocked by Windows Smart App Control; the `.zip` release works |
 | 10-28 ~11:45 | LaTeX packages `ieeetran multirow pgf cite courier` via `tlmgr`, from the TeX Live 2025 archive (`ftp.math.utah.edu/pub/tex/historic/systems/texlive/2025/tlnet-final`) | OK. The current repository is TeX Live 2026 and refuses the older install |
