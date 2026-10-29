@@ -81,6 +81,9 @@ What was done, in order. Times are IST. Newest entries at the bottom. Commit has
 | 14:00 -> 10:57 (10-29) | Experiment 2 ran: 7 MAE pretrainings x 2 variants + 7 more for seeds 1-2, 135 tuning runs, 405 fine-tuning runs in total (of which part copied from v1). Learning rate changed in 9 of 16 old cells (re-run). GPU at 100 % but thermally throttled (~89 C), MAE 22.8 min instead of 21.5 | `4bb0b69` |
 | 10:57 | `analyze2` done, results pushed. Verdicts: H6, H7, H8 not supported; H9, H11 supported; H10 partly. C still wins 20/20. Written into `FINDINGS.md` | this commit |
 
+| ~11:30 | Pushed everything except datasets (11 GB) and MAE encoder checkpoints (802 MB): per-run folders (61 MB), MAE reconstructions / loss curves / info for all 33 pretrainings (`results/*/mae/`), `logs/experiment.log`, `prepare.log`, `distance.log` | `28a541d` |
+| ~12:30 | Paper updated with Study 2 and rewritten throughout in plainer, original wording. New: Study 2 section, figure (gaps to C for E, E2, F), table, all 11 hypotheses in one table, 2 new verified references (Reed et al. 2022, Gururangan et al. 2020). To stay at 8 pages, the Study 1 distance scatter, calibration plot and E-C gap plot were removed (their numbers are in tables/text) and the reconstruction figure shrunk to one image per domain. Compiles with no warnings, 8 pages | this commit |
+
 ## Next
 1. Namrata / Soham read the PDF and send corrections
 2. Look at the plots (`results/crossover_v1/plots/`) and MAE reconstructions.

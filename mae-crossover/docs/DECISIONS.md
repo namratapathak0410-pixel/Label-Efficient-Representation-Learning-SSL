@@ -45,3 +45,6 @@ If a decision changes later, the old row stays and a new row is added (so the hi
 | 38 | 10-28 | v2 reuses v1 runs when the (dataset, arm) learning rate is unchanged by the wider grid; re-runs those cells when it changes | Claude | Same experiment, so copying is valid; saves ~9 h |
 | 39 | 10-28 | `pandas` pinned to 2.3.3 | Claude | Windows Application Control started blocking a DLL of pandas 3.1.0 |
 | 40 | 10-28 | Time-left estimate written to the log after every task (ETA lines, `logs/STATUS.txt`) | Soham | Estimate = expected seconds of every unfinished task, corrected by the measured actual/expected ratio |
+| 41 | 10-29 | Push per-run results, MAE pictures and logs; keep datasets and encoder checkpoints local | Soham ("push everything"), Claude for the exclusions | Data are public and rebuilt by `prepare`; checkpoints are 802 MB |
+| 42 | 10-29 | Paper presents experiment 2 as "Study 2" next to Study 1; Study 1 numbers stay those of the original pre-registered run | Claude | Keeps the first pre-registration intact; Study 2 reports the re-tuned numbers separately |
+| 43 | 10-29 | Paper text rewritten in plainer, original wording; 8 pages (was 7) | Soham asked for low plagiarism and human-sounding sentences | Study 2 needs about a page; three Study 1 figures dropped whose numbers already appear in tables |

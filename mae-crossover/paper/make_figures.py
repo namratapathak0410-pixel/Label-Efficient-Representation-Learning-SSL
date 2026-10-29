@@ -138,10 +138,10 @@ X0, PITCH, TILE, ROWS_Y = 20, 174, 150, [31, 207, 383]
 tiles = []
 for d in DATASETS:
     im = np.asarray(Image.open(CKPT / d / "mae_seed0" / "reconstructions.png").convert("RGB"))
-    for j in range(2):
+    for j in range(1):  # one image per domain, so the figure fits one column
         x = X0 + j * PITCH
         tiles.append((d, [im[y:y + TILE, x:x + TILE] for y in ROWS_Y]))
-fig, axes = plt.subplots(3, 8, figsize=(7.16, 2.85))
+fig, axes = plt.subplots(3, 4, figsize=(3.45, 2.7))
 for c, (d, col) in enumerate(tiles):
     for r in range(3):
         ax = axes[r, c]
@@ -150,8 +150,7 @@ for c, (d, col) in enumerate(tiles):
         ax.set_yticks([])
         for sp in ax.spines.values():
             sp.set_visible(False)
-    if c % 2 == 0:
-        axes[0, c].set_title(NAMES[d], loc="left")
+    axes[0, c].set_title(NAMES[d])
 for r, lab in enumerate(["masked", "reconstr.", "original"]):
     axes[r, 0].set_ylabel(lab, fontsize=6.5)
 fig.subplots_adjust(wspace=0.04, hspace=0.04)
@@ -231,7 +230,80 @@ for b in BUDGETS:
     rows.append(f"{b} & " + " & ".join(cells) + " \\\\")
 (TAB / "ranking.tex").write_text("\n".join(rows) + "\n")
 
+# ---------- Study 2 (results/crossover_v2): bigger MAE pool (E2), ImageNet + MAE (F), ResNet-34 (A2) ----------
+import sys
+
+sys.path.insert(0, str(ROOT))
+from mc.analyze import mean_gap_log  # noqa: E402  (same log-budget average as the analysis)
+
+RES2 = ROOT / "results" / "crossover_v2"
+summ2 = pd.read_csv(RES2 / "summary.csv")
+runs2 = pd.read_csv(RES2 / "runs.csv")
+G2 = {k: pd.read_csv(RES2 / f"gap_{k}.csv") for k in
+      ["E_minus_C", "E2_minus_C", "F_minus_C", "E2_minus_E", "A2_minus_A", "F_minus_E2"]}
+S2COL = {"E_minus_C": ("#2ca02c", "E: MAE, 5k pool"), "E2_minus_C": ("#9467bd", "E2: MAE, 20k pool"),
+         "F_minus_C": ("#d62728", "F: ImageNet + MAE")}
+
+fig, axes = plt.subplots(1, 4, figsize=(7.16, 1.75), sharey=False)
+for ax, d in zip(axes, DATASETS):
+    for k, (col, lab) in S2COL.items():
+        g = G2[k][G2[k].dataset == d].sort_values("budget_pct")
+        if len(g):
+            ax.plot(g.budget_pct, g.gap, marker="o", color=col, label=lab)
+            ax.fill_between(g.budget_pct, g.ci_lo, g.ci_hi, color=col, alpha=0.15, lw=0)
+    ax.axhline(0, color="k", lw=0.7, ls="--")
+    log_axis(ax)
+    ax.set_title(NAMES[d] + (" (no extra images)" if d == "pets" else ""))
+    ax.set_xlabel("label budget (% of train labels)")
+axes[0].set_ylabel("macro-F1 gap to C")
+h, l = axes[0].get_legend_handles_labels()
+fig.legend(h, l, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.08))
+fig.tight_layout(w_pad=0.6)
+save(fig, "study2_gaps.pdf")
+
+
+def nsig(g, side):
+    return int((g.ci_lo > 0).sum() if side > 0 else (g.ci_hi < 0).sum())
+
+
+rows = []
+for d in DATASETS:
+    sel = {k: v[v.dataset == d] for k, v in G2.items()}
+    if len(sel["E2_minus_E"]):
+        e2 = (f"{signed(mean_gap_log(sel['E2_minus_E']))} & {nsig(sel['E2_minus_E'], 1)}/{nsig(sel['E2_minus_E'], -1)} & "
+              f"{signed(mean_gap_log(sel['E2_minus_C']))}")
+    else:
+        e2 = "-- & -- & --"
+    f = sel["F_minus_C"]
+    a = sel["A2_minus_A"]
+    rows.append(f"{NAMES[d]} & {signed(mean_gap_log(sel['E_minus_C']))} & {e2} & {signed(mean_gap_log(f))} & "
+                f"{int((f.gap > 0).sum())}/{nsig(f, -1)} & {signed(a.gap.min())} to {signed(a.gap.max())} \\\\")
+(TAB / "study2.tex").write_text("\n".join(rows) + "\n")
+
 # ---------- Numbers quoted in the text (printed for checking) ----------
+print("STUDY 2: runs", len(runs2), " winners:", summ2.loc[summ2.groupby(["dataset", "budget_pct"])
+      .test_macro_f1_mean.idxmax()].arm.value_counts().to_dict())
+for k, g in G2.items():
+    print(f"  {k}: positive {(g.gap > 0).sum()}/{len(g)}, CI>0 {nsig(g, 1)}, CI<0 {nsig(g, -1)}, "
+          f"range {g.gap.min():+.3f}..{g.gap.max():+.3f}")
+print("  F-C cells:", G2["F_minus_C"].round(3)[["dataset", "budget_pct", "gap", "ci_lo", "ci_hi"]].values.tolist())
+print("  mean ECE:", summ2.groupby("arm")[["test_ece_mean", "test_ts_ece_mean"]].mean().round(3).to_dict())
+print("  early stop:", runs2.groupby("arm").stopped_early.mean().round(2).to_dict())
+lrc = pd.read_csv(RES2 / "lr_changes_vs_v1.csv")
+print("  lr changed:", int(lrc.changed.sum()), "/", len(lrc))
+grid = {"s": [2.5e-4, 4e-3], "p": [1.25e-4, 2e-3]}
+ch = json.load(open(RES2 / "lr_choice.json"))
+edge = [k for k, v in ch.items() if v["lr"] in (grid["s"] if ("A" == k.split("|")[1][0] or k.split("|")[1].startswith("D")) else grid["p"])]
+print("  lr at new grid edge:", len(edge), "/", len(ch), edge)
+for d in ["plantvillage", "eurosat", "cifar10"]:
+    loss = [pd.read_csv(ROOT / "checkpoints" / "crossover_v2" / d / f"mae_big_seed{s}" / "mae_loss.csv").iloc[-1, -1]
+            for s in range(3)]
+    print(f"  MAE 20k {d}: final loss {np.mean(loss):.3f}")
+for d in DATASETS:
+    loss = [pd.read_csv(ROOT / "checkpoints" / "crossover_v2" / d / f"imagenet_mae_seed{s}" / "mae_loss.csv").iloc[-1, -1]
+            for s in range(3)]
+    print(f"  MAE from ImageNet {d}: final loss {np.mean(loss):.3f}")
+
 best_raw = summ.loc[summ.groupby(["dataset", "budget_pct"]).test_ece_mean.idxmin()].arm.value_counts()
 best_ts = summ.loc[summ.groupby(["dataset", "budget_pct"]).test_ts_ece_mean.idxmin()].arm.value_counts()
 winners = summ.loc[summ.groupby(["dataset", "budget_pct"]).test_macro_f1_mean.idxmax()].arm.value_counts()
